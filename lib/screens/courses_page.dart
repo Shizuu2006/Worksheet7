@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 
 import '../models/course.dart';
 import '../widgets/course_card.dart';
+import '../widgets/error_view.dart';
 import '../widgets/identity_banner.dart';
 import 'course_detail_page.dart';
 import '../identity.dart';
@@ -246,132 +247,113 @@ class _CoursesPageState extends State<CoursesPage> {
             ],
           ),
         ),
-        // Courses Grid / Empty State
+        // Loading, error, empty, and success states
         Expanded(
-          child: LayoutBuilder(
-            builder: (context, constraints) {
-              if (provider.isLoading) {
-                return const Center(child: CircularProgressIndicator());
-              }
-              if (provider.error != null) {
-                return Center(
-                  child: Padding(
-                    padding: const EdgeInsets.all(24),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const Icon(Icons.error_outline, size: 40),
-                        const SizedBox(height: 12),
-                        Text(
-                          'Gagal memuat mata kuliah:\n${provider.error}',
-                          textAlign: TextAlign.center,
-                        ),
-                        const SizedBox(height: 12),
-                        FilledButton.icon(
-                          onPressed: () =>
-                              context.read<CourseProvider>().loadCourses(),
-                          icon: const Icon(Icons.refresh),
-                          label: const Text('Coba lagi'),
-                        ),
-                      ],
-                    ),
-                  ),
-                );
-              }
-              if (filtered.isEmpty) {
-                return Center(
-                  child: Padding(
-                    padding: const EdgeInsets.all(32),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.all(20),
-                          decoration: BoxDecoration(
-                            color: Colors.indigo.shade50,
-                            shape: BoxShape.circle,
-                          ),
-                          child: Icon(
-                            Icons.search_off_rounded,
-                            size: 48,
-                            color: Colors.indigo.shade400,
-                          ),
-                        ),
-                        const SizedBox(height: 16),
-                        const Text(
-                          'Mata kuliah tidak ditemukan',
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            color: Color(0xFF1E293B),
-                          ),
-                        ),
-                        const SizedBox(height: 6),
-                        Text(
-                          'Coba ubah kata kunci atau filter pencarian Anda.',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(color: Colors.grey.shade600),
-                        ),
-                        const SizedBox(height: 16),
-                        OutlinedButton.icon(
-                          onPressed: () {
-                            _searchController.clear();
-                            setState(() {
-                              _searchQuery = '';
-                              _selectedFilter = 'Semua';
-                            });
-                          },
-                          icon: const Icon(Icons.refresh_rounded),
-                          label: const Text('Reset Pencarian'),
-                        ),
-                      ],
-                    ),
-                  ),
-                );
-              }
-
-              return GridView.builder(
-                padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: _columnsFor(constraints.maxWidth),
-                  crossAxisSpacing: 14,
-                  mainAxisSpacing: 14,
-                  mainAxisExtent: _cardExtentFor(constraints.maxWidth),
-                ),
-                itemCount: filtered.length,
-                itemBuilder: (context, index) {
-                  final course = filtered[index];
-                  final code = course.code;
-                  final isFav = provider.isFavorite(code);
-
-                  return CourseCard(
-                    course: course,
-                    isFavorite: isFav,
-                    onTap: () => _openDetail(context, course),
-                    onLongPress: () => _showQuickInfo(context, course),
-                    onFavoriteTap: () {
-                      provider.toggleFavorite(code);
-                      ScaffoldMessenger.of(context).hideCurrentSnackBar();
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          duration: const Duration(milliseconds: 1500),
-                          behavior: SnackBarBehavior.floating,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          content: Text(
-                            isFav
-                                ? '${course.title} dihapus dari favorit'
-                                : '${course.title} ditambahkan ke favorit',
+          child: provider.isLoading
+              ? const Center(child: CircularProgressIndicator())
+              : provider.error != null
+              ? ErrorView(
+                  message: provider.error!,
+                  onRetry: provider.loadCourses,
+                )
+              : provider.courses.isEmpty
+              ? const Center(child: Text('Data course belum tersedia'))
+              : LayoutBuilder(
+                  builder: (context, constraints) {
+                    if (filtered.isEmpty) {
+                      return Center(
+                        child: Padding(
+                          padding: const EdgeInsets.all(32),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.all(20),
+                                decoration: BoxDecoration(
+                                  color: Colors.indigo.shade50,
+                                  shape: BoxShape.circle,
+                                ),
+                                child: Icon(
+                                  Icons.search_off_rounded,
+                                  size: 48,
+                                  color: Colors.indigo.shade400,
+                                ),
+                              ),
+                              const SizedBox(height: 16),
+                              const Text(
+                                'Mata kuliah tidak ditemukan',
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                  color: Color(0xFF1E293B),
+                                ),
+                              ),
+                              const SizedBox(height: 6),
+                              Text(
+                                'Coba ubah kata kunci atau filter pencarian Anda.',
+                                textAlign: TextAlign.center,
+                                style: TextStyle(color: Colors.grey.shade600),
+                              ),
+                              const SizedBox(height: 16),
+                              OutlinedButton.icon(
+                                onPressed: () {
+                                  _searchController.clear();
+                                  setState(() {
+                                    _searchQuery = '';
+                                    _selectedFilter = 'Semua';
+                                  });
+                                },
+                                icon: const Icon(Icons.refresh_rounded),
+                                label: const Text('Reset Pencarian'),
+                              ),
+                            ],
                           ),
                         ),
                       );
-                    },
-                  );
-                },
-              );
-            },
-          ),
+                    }
+
+                    return GridView.builder(
+                      padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: _columnsFor(constraints.maxWidth),
+                        crossAxisSpacing: 14,
+                        mainAxisSpacing: 14,
+                        mainAxisExtent: _cardExtentFor(constraints.maxWidth),
+                      ),
+                      itemCount: filtered.length,
+                      itemBuilder: (context, index) {
+                        final course = filtered[index];
+                        final code = course.code;
+                        final isFav = provider.isFavorite(code);
+
+                        return CourseCard(
+                          course: course,
+                          isFavorite: isFav,
+                          onTap: () => _openDetail(context, course),
+                          onLongPress: () => _showQuickInfo(context, course),
+                          onFavoriteTap: () {
+                            provider.toggleFavorite(code);
+                            ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                duration: const Duration(milliseconds: 1500),
+                                behavior: SnackBarBehavior.floating,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                content: Text(
+                                  isFav
+                                      ? '${course.title} dihapus dari favorit'
+                                      : '${course.title} ditambahkan ke favorit',
+                                ),
+                              ),
+                            );
+                          },
+                        );
+                      },
+                    );
+                  },
+                ),
         ),
       ],
     );

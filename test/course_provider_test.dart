@@ -5,9 +5,7 @@ import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   test('toggleFavorite menambah/menghapus dan memanggil listener', () {
-    final provider = CourseProvider(
-      repository: CourseRepository(CourseApiService('')),
-    );
+    final provider = CourseProvider(CourseRepository(CourseApiService('')));
     var notified = 0;
     provider.addListener(() => notified++);
 

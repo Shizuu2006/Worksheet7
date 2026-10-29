@@ -4,9 +4,9 @@ import '../models/course.dart';
 import '../repositories/course_repository.dart';
 
 class CourseProvider extends ChangeNotifier {
-  final CourseRepository repository;
+  CourseProvider(this._repository);
 
-  CourseProvider({required this.repository});
+  final CourseRepository _repository;
 
   final Set<String> favorites = {};
 
@@ -21,20 +21,24 @@ class CourseProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  List<Course> courses = [];
-  bool isLoading = false;
-  String? error;
+  List<Course> _courses = [];
+  bool _isLoading = false;
+  String? _error;
+
+  List<Course> get courses => _courses;
+  bool get isLoading => _isLoading;
+  String? get error => _error;
 
   Future<void> loadCourses() async {
-    isLoading = true;
-    error = null;
+    _isLoading = true;
+    _error = null;
     notifyListeners();
     try {
-      courses = await repository.getCourses();
+      _courses = await _repository.getCourses();
     } catch (e) {
-      error = e.toString();
+      _error = e.toString().replaceFirst('Exception: ', '');
     } finally {
-      isLoading = false;
+      _isLoading = false;
       notifyListeners();
     }
   }

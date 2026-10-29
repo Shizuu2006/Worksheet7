@@ -33,7 +33,7 @@ void main() {
   ) async {
     final result = Completer<List<Course>>();
     final provider = CourseProvider(
-      repository: CourseRepository(_CompleterCourseApiService(result.future)),
+      CourseRepository(_CompleterCourseApiService(result.future)),
     );
     final loading = provider.loadCourses();
 
@@ -66,7 +66,7 @@ void main() {
     tester,
   ) async {
     final provider = CourseProvider(
-      repository: CourseRepository(_FailingCourseApiService()),
+      CourseRepository(_FailingCourseApiService()),
     );
     await provider.loadCourses();
 
@@ -78,6 +78,22 @@ void main() {
     );
 
     expect(find.textContaining('Asset tidak dapat dibaca'), findsOneWidget);
-    expect(find.text('Coba lagi'), findsOneWidget);
+    expect(find.text('Retry'), findsOneWidget);
+  });
+
+  testWidgets('CoursesPage shows an explicit empty state', (tester) async {
+    final provider = CourseProvider(
+      CourseRepository(_CompleterCourseApiService(Future.value([]))),
+    );
+    await provider.loadCourses();
+
+    await tester.pumpWidget(
+      ChangeNotifierProvider.value(
+        value: provider,
+        child: const MaterialApp(home: Scaffold(body: CoursesPage())),
+      ),
+    );
+
+    expect(find.text('Data course belum tersedia'), findsOneWidget);
   });
 }

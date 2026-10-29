@@ -19,8 +19,7 @@ class CourseExplorerApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
       create: (_) => CourseProvider(
-        repository:
-            repository ??
+        repository ??
             CourseRepository(
               CourseApiService('https://course-api-pearl.vercel.app'),
             ),

@@ -2,16 +2,17 @@ import 'package:course_explorer/models/course.dart';
 import 'package:course_explorer/providers/course_provider.dart';
 import 'package:course_explorer/repositories/course_repository.dart';
 import 'package:course_explorer/responsive_shell.dart';
-import 'package:course_explorer/services/course_api_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
+
+import 'helpers/fake_course_api_service.dart';
 
 void main() {
   testWidgets('Favorites tab opens on the mobile navigation bar', (
     tester,
   ) async {
-    final provider = _createProviderWithFavorite();
+    final provider = await _createProviderWithFavorite();
     await tester.pumpWidget(
       ChangeNotifierProvider.value(
         value: provider,
@@ -40,7 +41,7 @@ void main() {
     addTearDown(tester.view.resetPhysicalSize);
     addTearDown(tester.view.resetDevicePixelRatio);
 
-    final provider = _createProviderWithFavorite();
+    final provider = await _createProviderWithFavorite();
     await tester.pumpWidget(
       ChangeNotifierProvider.value(
         value: provider,
@@ -57,17 +58,22 @@ void main() {
   });
 }
 
-CourseProvider _createProviderWithFavorite() {
-  final provider =
-      CourseProvider(repository: CourseRepository(CourseApiService('')))
-        ..courses = [
-          const Course(
+Future<CourseProvider> _createProviderWithFavorite() async {
+  final provider = CourseProvider(
+    CourseRepository(
+      FakeCourseApiService(
+        courses: const [
+          Course(
             code: 'IF101',
             title: 'Pemrograman Mobile',
             credits: 3,
             status: 'Wajib',
           ),
-        ];
+        ],
+      ),
+    ),
+  );
+  await provider.loadCourses();
   provider.toggleFavorite('IF101');
   return provider;
 }

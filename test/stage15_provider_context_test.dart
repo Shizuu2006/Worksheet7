@@ -9,9 +9,7 @@ void main() {
   testWidgets('a context above the provider cannot read CourseProvider', (
     tester,
   ) async {
-    final provider = CourseProvider(
-      repository: CourseRepository(CourseApiService('')),
-    );
+    final provider = CourseProvider(CourseRepository(CourseApiService('')));
 
     await tester.pumpWidget(
       MaterialApp(
@@ -31,9 +29,7 @@ void main() {
   });
 
   testWidgets('a descendant context can read CourseProvider', (tester) async {
-    final provider = CourseProvider(
-      repository: CourseRepository(CourseApiService('')),
-    );
+    final provider = CourseProvider(CourseRepository(CourseApiService('')));
 
     await tester.pumpWidget(
       ChangeNotifierProvider.value(
@@ -56,9 +52,7 @@ void main() {
   testWidgets('watch rebuilds the UI after favorite state changes', (
     tester,
   ) async {
-    final provider = CourseProvider(
-      repository: CourseRepository(CourseApiService('')),
-    );
+    final provider = CourseProvider(CourseRepository(CourseApiService('')));
 
     await tester.pumpWidget(
       ChangeNotifierProvider.value(

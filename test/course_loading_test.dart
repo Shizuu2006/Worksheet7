@@ -27,6 +27,26 @@ class _FailingCourseApiService extends CourseApiService {
   }
 }
 
+class _CreatingCourseApiService extends CourseApiService {
+  _CreatingCourseApiService() : super('');
+
+  int getCalls = 0;
+
+  @override
+  Future<List<Course>> getCourses() async {
+    getCalls++;
+    return getCalls == 1
+        ? const [Course(code: 'OLD01', title: 'Old Course', credits: 2)]
+        : const [
+            Course(code: 'NEW01', title: 'New Course', credits: 3),
+            Course(code: 'NEW02', title: 'Another Course', credits: 2),
+          ];
+  }
+
+  @override
+  Future<Course> createCourse(Course course) async => course;
+}
+
 void main() {
   testWidgets('CoursesPage shows loading then the loaded course list', (
     tester,
@@ -95,5 +115,22 @@ void main() {
     );
 
     expect(find.text('Data course belum tersedia'), findsOneWidget);
+  });
+
+  test('createCourse refreshes the course list after creation', () async {
+    final service = _CreatingCourseApiService();
+    final provider = CourseProvider(CourseRepository(service));
+
+    await provider.loadCourses();
+    expect(provider.courses.single.code, 'OLD01');
+
+    final error = await provider.createCourse(
+      const Course(code: 'NEW01', title: 'New Course', credits: 3),
+    );
+
+    expect(error, isNull);
+    expect(service.getCalls, 2);
+    expect(provider.courses.map((course) => course.code), ['NEW01', 'NEW02']);
+    expect(provider.isSaving, isFalse);
   });
 }

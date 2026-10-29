@@ -20,4 +20,34 @@ class CourseApiService {
     final List data = jsonDecode(response.body) as List;
     return data.map((e) => Course.fromJson(e as Map<String, dynamic>)).toList();
   }
+
+  Future<Course> createCourse(Course course) async {
+    final uri = Uri.parse('$baseUrl/courses');
+    final response =
+        await (client?.post(
+              uri,
+              headers: {'Content-Type': 'application/json'},
+              body: jsonEncode(course.toJson()),
+            ) ??
+            http.post(
+              uri,
+              headers: {'Content-Type': 'application/json'},
+              body: jsonEncode(course.toJson()),
+            ));
+    if (response.statusCode == 200 || response.statusCode == 201) {
+      return Course.fromJson(jsonDecode(response.body) as Map<String, dynamic>);
+    }
+    throw Exception(_messageFrom(response, 'Gagal membuat course'));
+  }
+
+  String _messageFrom(http.Response response, String fallback) {
+    try {
+      final body = jsonDecode(response.body) as Map<String, dynamic>;
+      return '${body['error'] ?? fallback} (HTTP ${response.statusCode})';
+    } on FormatException {
+      return '$fallback (HTTP ${response.statusCode})';
+    } on TypeError {
+      return '$fallback (HTTP ${response.statusCode})';
+    }
+  }
 }

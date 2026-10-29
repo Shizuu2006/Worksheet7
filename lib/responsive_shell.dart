@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import 'screens/courses_page.dart';
+import 'screens/course_form_page.dart';
 import 'screens/favorites_page.dart';
 import 'screens/home_page.dart';
 import 'screens/profile_page.dart';
@@ -61,10 +62,15 @@ class _ResponsiveShellState extends State<ResponsiveShell> {
                   children: [
                     const Text(
                       'Course Explorer',
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                     Text(
-                      expanded ? 'Expanded Mode (Rail)' : 'Adaptive Mobile Mode',
+                      expanded
+                          ? 'Expanded Mode (Rail)'
+                          : 'Adaptive Mobile Mode',
                       style: TextStyle(
                         fontSize: 11,
                         color: Colors.grey.shade500,
@@ -90,7 +96,11 @@ class _ResponsiveShellState extends State<ResponsiveShell> {
                         child: CircleAvatar(
                           radius: 18,
                           backgroundColor: cs.primary.withValues(alpha: 0.1),
-                          child: Icon(Icons.explore_rounded, color: cs.primary, size: 20),
+                          child: Icon(
+                            Icons.explore_rounded,
+                            color: cs.primary,
+                            size: 20,
+                          ),
                         ),
                       ),
                       destinations: [
@@ -124,11 +134,26 @@ class _ResponsiveShellState extends State<ResponsiveShell> {
                         ),
                       ],
                     ),
-                    const VerticalDivider(width: 1, thickness: 1, color: Color(0xFFE2E8F0)),
+                    const VerticalDivider(
+                      width: 1,
+                      thickness: 1,
+                      color: Color(0xFFE2E8F0),
+                    ),
                     Expanded(child: content),
                   ],
                 )
               : content,
+          floatingActionButton: _index == 1
+              ? FloatingActionButton(
+                  onPressed: () => Navigator.push<void>(
+                    context,
+                    MaterialPageRoute<void>(
+                      builder: (_) => const CourseFormPage(),
+                    ),
+                  ),
+                  child: const Icon(Icons.add),
+                )
+              : null,
           bottomNavigationBar: expanded
               ? null
               : NavigationBar(

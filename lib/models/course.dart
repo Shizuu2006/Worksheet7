@@ -31,6 +31,5 @@ class Course {
     'title': title,
     'credits': credits,
     'status': status,
-    'description': description,
   };
 }

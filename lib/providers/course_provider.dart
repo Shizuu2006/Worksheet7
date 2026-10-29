@@ -23,10 +23,12 @@ class CourseProvider extends ChangeNotifier {
 
   List<Course> _courses = [];
   bool _isLoading = false;
+  bool _isSaving = false;
   String? _error;
 
   List<Course> get courses => _courses;
   bool get isLoading => _isLoading;
+  bool get isSaving => _isSaving;
   String? get error => _error;
 
   Future<void> loadCourses() async {
@@ -39,6 +41,21 @@ class CourseProvider extends ChangeNotifier {
       _error = e.toString().replaceFirst('Exception: ', '');
     } finally {
       _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  Future<String?> createCourse(Course course) async {
+    _isSaving = true;
+    notifyListeners();
+    try {
+      await _repository.createCourse(course);
+      await loadCourses();
+      return null;
+    } catch (e) {
+      return e.toString().replaceFirst('Exception: ', '');
+    } finally {
+      _isSaving = false;
       notifyListeners();
     }
   }

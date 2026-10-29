@@ -2,7 +2,7 @@ import 'package:course_explorer/models/course.dart';
 import 'package:course_explorer/providers/course_provider.dart';
 import 'package:course_explorer/repositories/course_repository.dart';
 import 'package:course_explorer/responsive_shell.dart';
-import 'package:course_explorer/services/course_service.dart';
+import 'package:course_explorer/services/course_api_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
@@ -58,15 +58,16 @@ void main() {
 }
 
 CourseProvider _createProviderWithFavorite() {
-  final provider = CourseProvider(repository: CourseRepository(CourseService()))
-    ..courses = [
-      const Course(
-        code: 'IF101',
-        title: 'Pemrograman Mobile',
-        credits: 3,
-        status: 'Wajib',
-      ),
-    ];
+  final provider =
+      CourseProvider(repository: CourseRepository(CourseApiService('')))
+        ..courses = [
+          const Course(
+            code: 'IF101',
+            title: 'Pemrograman Mobile',
+            credits: 3,
+            status: 'Wajib',
+          ),
+        ];
   provider.toggleFavorite('IF101');
   return provider;
 }

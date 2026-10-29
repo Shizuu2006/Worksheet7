@@ -4,23 +4,25 @@ import 'package:course_explorer/screens/courses_page.dart';
 import 'package:course_explorer/models/course.dart';
 import 'package:course_explorer/providers/course_provider.dart';
 import 'package:course_explorer/repositories/course_repository.dart';
-import 'package:course_explorer/services/course_service.dart';
+import 'package:course_explorer/services/course_api_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
 
-class _CompleterCourseService extends CourseService {
-  _CompleterCourseService(this.result);
+class _CompleterCourseApiService extends CourseApiService {
+  _CompleterCourseApiService(this.result) : super('');
 
   final Future<List<Course>> result;
 
   @override
-  Future<List<Course>> loadCourses() => result;
+  Future<List<Course>> getCourses() => result;
 }
 
-class _FailingCourseService extends CourseService {
+class _FailingCourseApiService extends CourseApiService {
+  _FailingCourseApiService() : super('');
+
   @override
-  Future<List<Course>> loadCourses() async {
+  Future<List<Course>> getCourses() async {
     throw Exception('Asset tidak dapat dibaca');
   }
 }
@@ -31,7 +33,7 @@ void main() {
   ) async {
     final result = Completer<List<Course>>();
     final provider = CourseProvider(
-      repository: CourseRepository(_CompleterCourseService(result.future)),
+      repository: CourseRepository(_CompleterCourseApiService(result.future)),
     );
     final loading = provider.loadCourses();
 
@@ -64,7 +66,7 @@ void main() {
     tester,
   ) async {
     final provider = CourseProvider(
-      repository: CourseRepository(_FailingCourseService()),
+      repository: CourseRepository(_FailingCourseApiService()),
     );
     await provider.loadCourses();
 

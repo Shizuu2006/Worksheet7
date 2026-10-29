@@ -1,29 +1,30 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import 'api_test.dart';
 import 'app_theme.dart';
 import 'widgets/identity_banner.dart';
 import 'providers/course_provider.dart';
 import 'repositories/course_repository.dart';
 import 'responsive_shell.dart';
-import 'services/course_service.dart';
+import 'services/course_api_service.dart';
 
-Future<void> main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  await testFetchCourses();
-  runApp(const CourseExplorerApp());
-}
+void main() => runApp(const CourseExplorerApp());
 
 class CourseExplorerApp extends StatelessWidget {
-  const CourseExplorerApp({super.key});
+  const CourseExplorerApp({super.key, this.repository});
+
+  final CourseRepository? repository;
 
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (_) =>
-          CourseProvider(repository: CourseRepository(CourseService()))
-            ..loadCourses(),
+      create: (_) => CourseProvider(
+        repository:
+            repository ??
+            CourseRepository(
+              CourseApiService('https://course-api-pearl.vercel.app'),
+            ),
+      )..loadCourses(),
       child: MaterialApp(
         title: 'Course Explorer',
         debugShowCheckedModeBanner: false,

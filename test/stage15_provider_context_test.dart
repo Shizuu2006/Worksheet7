@@ -1,6 +1,6 @@
 import 'package:course_explorer/providers/course_provider.dart';
 import 'package:course_explorer/repositories/course_repository.dart';
-import 'package:course_explorer/services/course_service.dart';
+import 'package:course_explorer/services/course_api_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
@@ -10,7 +10,7 @@ void main() {
     tester,
   ) async {
     final provider = CourseProvider(
-      repository: CourseRepository(CourseService()),
+      repository: CourseRepository(CourseApiService('')),
     );
 
     await tester.pumpWidget(
@@ -32,7 +32,7 @@ void main() {
 
   testWidgets('a descendant context can read CourseProvider', (tester) async {
     final provider = CourseProvider(
-      repository: CourseRepository(CourseService()),
+      repository: CourseRepository(CourseApiService('')),
     );
 
     await tester.pumpWidget(
@@ -57,7 +57,7 @@ void main() {
     tester,
   ) async {
     final provider = CourseProvider(
-      repository: CourseRepository(CourseService()),
+      repository: CourseRepository(CourseApiService('')),
     );
 
     await tester.pumpWidget(

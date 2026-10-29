@@ -1,13 +1,18 @@
 import 'package:course_explorer/identity.dart';
 import 'package:course_explorer/main.dart';
+import 'package:course_explorer/repositories/course_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+
+import 'helpers/fake_course_api_service.dart';
 
 void main() {
   testWidgets(
     'courses load through the app layers and favorites stay in sync across screens',
     (tester) async {
-      await tester.pumpWidget(const CourseExplorerApp());
+      await tester.pumpWidget(
+        CourseExplorerApp(repository: CourseRepository(FakeCourseApiService())),
+      );
       await tester.pumpAndSettle();
 
       expect(find.text('Pemrograman Mobile'), findsOneWidget);

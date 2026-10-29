@@ -1,15 +1,15 @@
 import 'package:course_explorer/models/course.dart';
 import 'package:course_explorer/repositories/course_repository.dart';
-import 'package:course_explorer/services/course_service.dart';
+import 'package:course_explorer/services/course_api_service.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-class _FakeCourseService extends CourseService {
-  _FakeCourseService(this.courses);
+class _FakeCourseApiService extends CourseApiService {
+  _FakeCourseApiService(this.courses) : super('');
 
   final List<Course> courses;
 
   @override
-  Future<List<Course>> loadCourses() async => courses;
+  Future<List<Course>> getCourses() async => courses;
 }
 
 void main() {
@@ -22,7 +22,7 @@ void main() {
         status: 'Wajib',
       ),
     ];
-    final repository = CourseRepository(_FakeCourseService(expected));
+    final repository = CourseRepository(_FakeCourseApiService(expected));
 
     final courses = await repository.getCourses();
 

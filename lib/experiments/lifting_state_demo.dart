@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../models/course.dart';
 import '../widgets/course_card.dart';
 import '../course_data.dart';
 import '../widgets/identity_banner.dart';
@@ -25,7 +26,7 @@ class _LiftingStateDemoPageState extends State<LiftingStateDemoPage> {
 
   @override
   Widget build(BuildContext context) {
-    final course = courses.first;
+    final course = Course.fromJson(courses.first);
 
     return Scaffold(
       appBar: AppBar(
@@ -61,18 +62,15 @@ class _LiftingStateDemoPageState extends State<LiftingStateDemoPage> {
             onFavoriteTap: _toggleFavorite,
           ),
           const SizedBox(height: 12),
-          _FavoriteSwitch(
-            isFavorite: _isFavorite,
-            onChanged: _setFavorite,
-          ),
+          _FavoriteSwitch(isFavorite: _isFavorite, onChanged: _setFavorite),
           const SizedBox(height: 16),
           Card(
             child: Padding(
               padding: const EdgeInsets.all(16),
               child: Text(
                 _isFavorite
-                    ? '${course['title']} ditandai sebagai favorite.'
-                    : '${course['title']} belum ditandai sebagai favorite.',
+                    ? '${course.title} ditandai sebagai favorite.'
+                    : '${course.title} belum ditandai sebagai favorite.',
               ),
             ),
           ),
@@ -92,10 +90,7 @@ class _FavoriteSwitch extends StatelessWidget {
   final bool isFavorite;
   final ValueChanged<bool> onChanged;
 
-  const _FavoriteSwitch({
-    required this.isFavorite,
-    required this.onChanged,
-  });
+  const _FavoriteSwitch({required this.isFavorite, required this.onChanged});
 
   @override
   Widget build(BuildContext context) {

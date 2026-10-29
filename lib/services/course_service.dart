@@ -1,4 +1,5 @@
 import 'dart:convert';
+
 import 'package:flutter/services.dart';
 
 import '../models/course.dart';
@@ -10,8 +11,6 @@ class CourseService {
     );
     final data = jsonDecode(jsonString) as Map<String, dynamic>;
     final list = data['courses'] as List<dynamic>;
-    return list
-        .map((e) => Course.fromJson(e as Map<String, dynamic>))
-        .toList();
+    return list.map((e) => Course.fromJson(e as Map<String, dynamic>)).toList();
   }
 }

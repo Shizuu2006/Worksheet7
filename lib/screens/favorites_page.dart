@@ -43,13 +43,6 @@ class FavoritesPage extends StatelessWidget {
                   itemCount: favoriteCourses.length,
                   itemBuilder: (context, index) {
                     final course = favoriteCourses[index];
-                    final courseData = {
-                      'code': course.code,
-                      'title': course.title,
-                      'credits': course.credits,
-                      'status': course.status,
-                      'description': course.description,
-                    };
 
                     return Card(
                       child: ListTile(
@@ -63,8 +56,7 @@ class FavoritesPage extends StatelessWidget {
                         onTap: () => Navigator.push(
                           context,
                           MaterialPageRoute<void>(
-                            builder: (_) =>
-                                CourseDetailPage(course: courseData),
+                            builder: (_) => CourseDetailPage(course: course),
                           ),
                         ),
                       ),

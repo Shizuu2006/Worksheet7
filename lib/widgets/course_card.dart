@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 
+import '../models/course.dart';
+
 class CourseCard extends StatelessWidget {
-  final Map<String, dynamic> course;
+  final Course course;
   final VoidCallback? onTap;
   final VoidCallback? onLongPress;
   final bool isFavorite;
@@ -57,11 +59,11 @@ class CourseCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final code = course['code'] as String? ?? '';
-    final title = course['title'] as String? ?? 'Untitled Course';
-    final credits = course['credits'] ?? 0;
-    final status = course['status'] as String? ?? 'Wajib';
-    final description = course['description'] as String? ?? '';
+    final code = course.code;
+    final title = course.title;
+    final credits = course.credits;
+    final status = course.status;
+    final description = course.description;
     final accentColor = _getCourseColor(code);
     final isWajib = status.toLowerCase() == 'wajib';
 
@@ -70,7 +72,9 @@ class CourseCard extends StatelessWidget {
         color: Colors.white,
         borderRadius: BorderRadius.circular(18),
         border: Border.all(
-          color: isFavorite ? Colors.red.withValues(alpha: 0.3) : const Color(0xFFE2E8F0),
+          color: isFavorite
+              ? Colors.red.withValues(alpha: 0.3)
+              : const Color(0xFFE2E8F0),
           width: isFavorite ? 1.5 : 1,
         ),
         boxShadow: [
@@ -134,11 +138,16 @@ class CourseCard extends StatelessWidget {
                           Row(
                             children: [
                               Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 8,
+                                  vertical: 3,
+                                ),
                                 decoration: BoxDecoration(
                                   color: const Color(0xFFF1F5F9),
                                   borderRadius: BorderRadius.circular(6),
-                                  border: Border.all(color: const Color(0xFFCBD5E1)),
+                                  border: Border.all(
+                                    color: const Color(0xFFCBD5E1),
+                                  ),
                                 ),
                                 child: Text(
                                   code,
@@ -152,7 +161,10 @@ class CourseCard extends StatelessWidget {
                               ),
                               const SizedBox(width: 6),
                               Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 8,
+                                  vertical: 3,
+                                ),
                                 decoration: BoxDecoration(
                                   color: isWajib
                                       ? const Color(0xFFEEF2FF)
@@ -186,7 +198,9 @@ class CourseCard extends StatelessWidget {
                     ),
                     if (onFavoriteTap != null)
                       IconButton(
-                        tooltip: isFavorite ? 'Hapus favorit' : 'Tambah favorit',
+                        tooltip: isFavorite
+                            ? 'Hapus favorit'
+                            : 'Tambah favorit',
                         onPressed: onFavoriteTap,
                         style: IconButton.styleFrom(
                           backgroundColor: isFavorite
@@ -194,8 +208,12 @@ class CourseCard extends StatelessWidget {
                               : const Color(0xFFF8FAFC),
                         ),
                         icon: Icon(
-                          isFavorite ? Icons.favorite_rounded : Icons.favorite_border_rounded,
-                          color: isFavorite ? Colors.red : const Color(0xFF94A3B8),
+                          isFavorite
+                              ? Icons.favorite_rounded
+                              : Icons.favorite_border_rounded,
+                          color: isFavorite
+                              ? Colors.red
+                              : const Color(0xFF94A3B8),
                           size: 22,
                         ),
                       ),

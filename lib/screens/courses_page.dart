@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../models/course.dart';
 import '../widgets/course_card.dart';
 import '../widgets/identity_banner.dart';
 import 'course_detail_page.dart';
@@ -36,10 +37,7 @@ class _CoursesPageState extends State<CoursesPage> {
     return 175;
   }
 
-  Future<void> _openDetail(
-    BuildContext context,
-    Map<String, dynamic> course,
-  ) async {
+  Future<void> _openDetail(BuildContext context, Course course) async {
     final result = await Navigator.push<bool>(
       context,
       MaterialPageRoute(builder: (_) => CourseDetailPage(course: course)),
@@ -47,7 +45,7 @@ class _CoursesPageState extends State<CoursesPage> {
 
     if (result == true && context.mounted) {
       final provider = context.read<CourseProvider>();
-      final code = course['code'] as String;
+      final code = course.code;
       if (!provider.isFavorite(code)) {
         provider.toggleFavorite(code);
       }
@@ -62,9 +60,7 @@ class _CoursesPageState extends State<CoursesPage> {
             children: [
               const Icon(Icons.favorite_rounded, color: Colors.red, size: 20),
               const SizedBox(width: 10),
-              Expanded(
-                child: Text('${course['title']} ditambahkan ke favorit!'),
-              ),
+              Expanded(child: Text('${course.title} ditambahkan ke favorit!')),
             ],
           ),
         ),
@@ -72,7 +68,7 @@ class _CoursesPageState extends State<CoursesPage> {
     }
   }
 
-  void _showQuickInfo(BuildContext context, Map<String, dynamic> course) {
+  void _showQuickInfo(BuildContext context, Course course) {
     showModalBottomSheet<void>(
       context: context,
       shape: const RoundedRectangleBorder(
@@ -108,7 +104,7 @@ class _CoursesPageState extends State<CoursesPage> {
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Text(
-                      course['code'] as String,
+                      course.code,
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
                         color: Theme.of(ctx).colorScheme.primary,
@@ -116,12 +112,12 @@ class _CoursesPageState extends State<CoursesPage> {
                     ),
                   ),
                   const SizedBox(width: 8),
-                  Text('${course['credits']} SKS • ${course['status']}'),
+                  Text('${course.credits} SKS • ${course.status}'),
                 ],
               ),
               const SizedBox(height: 12),
               Text(
-                course['title'] as String,
+                course.title,
                 style: const TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
@@ -129,7 +125,7 @@ class _CoursesPageState extends State<CoursesPage> {
               ),
               const SizedBox(height: 8),
               Text(
-                course['description'] as String,
+                course.description,
                 style: TextStyle(color: Colors.grey.shade700, height: 1.4),
               ),
               const Divider(height: 28),
@@ -162,20 +158,11 @@ class _CoursesPageState extends State<CoursesPage> {
   @override
   Widget build(BuildContext context) {
     final provider = context.watch<CourseProvider>();
-    final loadedCourses = provider.courses.map((course) {
-      return <String, dynamic>{
-        'code': course.code,
-        'title': course.title,
-        'credits': course.credits,
-        'status': course.status,
-        'description': course.description,
-      };
-    }).toList();
 
     // Filtering logic
-    final filtered = loadedCourses.where((c) {
-      final code = c['code'] as String;
-      final title = (c['title'] as String).toLowerCase();
+    final filtered = provider.courses.where((course) {
+      final code = course.code;
+      final title = course.title.toLowerCase();
       final q = _searchQuery.toLowerCase();
       final matchesSearch = title.contains(q) || code.toLowerCase().contains(q);
 
@@ -183,9 +170,9 @@ class _CoursesPageState extends State<CoursesPage> {
 
       switch (_selectedFilter) {
         case 'Wajib':
-          return (c['status'] as String).toLowerCase() == 'wajib';
+          return course.status.toLowerCase() == 'wajib';
         case 'Pilihan':
-          return (c['status'] as String).toLowerCase() == 'pilihan';
+          return course.status.toLowerCase() == 'pilihan';
         case 'Favorit':
           return provider.isFavorite(code);
         default:
@@ -354,7 +341,7 @@ class _CoursesPageState extends State<CoursesPage> {
                 itemCount: filtered.length,
                 itemBuilder: (context, index) {
                   final course = filtered[index];
-                  final code = course['code'] as String;
+                  final code = course.code;
                   final isFav = provider.isFavorite(code);
 
                   return CourseCard(
@@ -374,8 +361,8 @@ class _CoursesPageState extends State<CoursesPage> {
                           ),
                           content: Text(
                             isFav
-                                ? '${course['title']} dihapus dari favorit'
-                                : '${course['title']} ditambahkan ke favorit',
+                                ? '${course.title} dihapus dari favorit'
+                                : '${course.title} ditambahkan ke favorit',
                           ),
                         ),
                       );

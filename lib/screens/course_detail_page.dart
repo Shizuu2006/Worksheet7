@@ -2,10 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../identity.dart';
+import '../models/course.dart';
 import '../providers/course_provider.dart';
 
 class CourseDetailPage extends StatelessWidget {
-  final Map<String, dynamic> course;
+  final Course course;
 
   const CourseDetailPage({super.key, required this.course});
 
@@ -51,11 +52,11 @@ class CourseDetailPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final cs = theme.colorScheme;
-    final code = course['code'] as String? ?? '';
-    final title = course['title'] as String? ?? '';
-    final credits = course['credits'] ?? 0;
-    final status = course['status'] as String? ?? 'Wajib';
-    final description = course['description'] as String? ?? '';
+    final code = course.code;
+    final title = course.title;
+    final credits = course.credits;
+    final status = course.status;
+    final description = course.description;
     final accentColor = _getCourseColor(code);
 
     final provider = context.watch<CourseProvider>();

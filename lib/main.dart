@@ -35,7 +35,6 @@ class CourseExplorerApp extends StatelessWidget {
   }
 }
 
-/// Tahap 0 - Review Environment screen (tetap dipertahankan untuk worksheet)
 class Stage0 extends StatelessWidget {
   const Stage0({super.key});
 

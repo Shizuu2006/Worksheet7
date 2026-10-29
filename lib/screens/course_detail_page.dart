@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../identity.dart';
 import '../models/course.dart';
 import '../providers/course_provider.dart';
+import 'course_form_page.dart';
 
 class CourseDetailPage extends StatelessWidget {
   final Course course;
@@ -52,20 +53,35 @@ class CourseDetailPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final cs = theme.colorScheme;
-    final code = course.code;
-    final title = course.title;
-    final credits = course.credits;
-    final status = course.status;
-    final description = course.description;
-    final accentColor = _getCourseColor(code);
-
     final provider = context.watch<CourseProvider>();
+    final current = provider.courses.firstWhere(
+      (item) => item.code == course.code,
+      orElse: () => course,
+    );
+    final code = current.code;
+    final title = current.title;
+    final credits = current.credits;
+    final status = current.status;
+    final description = current.description;
+    final accentColor = _getCourseColor(code);
     final isFav = provider.isFavorite(code);
 
     return Scaffold(
       appBar: AppBar(
         title: Text(code),
         actions: [
+          IconButton(
+            tooltip: 'Edit course',
+            icon: const Icon(Icons.edit),
+            onPressed: current.id == null
+                ? null
+                : () => Navigator.push<void>(
+                    context,
+                    MaterialPageRoute<void>(
+                      builder: (_) => CourseFormPage(course: current),
+                    ),
+                  ),
+          ),
           IconButton(
             tooltip: isFav ? 'Hapus dari favorit' : 'Tambah ke favorit',
             icon: Icon(

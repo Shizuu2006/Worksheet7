@@ -43,24 +43,26 @@ class _CourseFormPageState extends State<CourseFormPage> {
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
 
-    if (_isEdit) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Fitur edit belum tersedia')),
-      );
-      return;
-    }
-
     final course = Course(
+      id: widget.course?.id,
       code: _code.text.trim(),
       title: _title.text.trim(),
       credits: int.parse(_credits.text.trim()),
       status: _status,
     );
-    final error = await context.read<CourseProvider>().createCourse(course);
+    final provider = context.read<CourseProvider>();
+    final error = _isEdit
+        ? await provider.updateCourse(course)
+        : await provider.createCourse(course);
     if (!mounted) return;
 
-    ScaffoldMessenger.of(context)
-        .showSnackBar(SnackBar(content: Text(error ?? 'Course ditambahkan')));
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          error ?? (_isEdit ? 'Course diperbarui' : 'Course ditambahkan'),
+        ),
+      ),
+    );
     if (error == null) Navigator.pop(context);
   }
 

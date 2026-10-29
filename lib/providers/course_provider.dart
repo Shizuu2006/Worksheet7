@@ -59,4 +59,23 @@ class CourseProvider extends ChangeNotifier {
       notifyListeners();
     }
   }
+
+  Future<String?> updateCourse(Course course) async {
+    _isSaving = true;
+    notifyListeners();
+    try {
+      final id = course.id;
+      if (id == null) {
+        throw Exception('Course tidak memiliki id');
+      }
+      await _repository.updateCourse(id, course);
+      await loadCourses();
+      return null;
+    } catch (e) {
+      return e.toString().replaceFirst('Exception: ', '');
+    } finally {
+      _isSaving = false;
+      notifyListeners();
+    }
+  }
 }

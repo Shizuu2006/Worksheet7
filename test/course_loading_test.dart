@@ -31,6 +31,7 @@ class _CreatingCourseApiService extends CourseApiService {
   _CreatingCourseApiService() : super('');
 
   int getCalls = 0;
+  int? updatedId;
 
   @override
   Future<List<Course>> getCourses() async {
@@ -45,6 +46,11 @@ class _CreatingCourseApiService extends CourseApiService {
 
   @override
   Future<Course> createCourse(Course course) async => course;
+
+  @override
+  Future<void> updateCourse(int id, Course course) async {
+    updatedId = id;
+  }
 }
 
 void main() {
@@ -131,6 +137,41 @@ void main() {
     expect(error, isNull);
     expect(service.getCalls, 2);
     expect(provider.courses.map((course) => course.code), ['NEW01', 'NEW02']);
+    expect(provider.isSaving, isFalse);
+  });
+
+  test('updateCourse sends the id and refreshes the course list', () async {
+    final service = _CreatingCourseApiService();
+    final provider = CourseProvider(CourseRepository(service));
+
+    await provider.loadCourses();
+    final error = await provider.updateCourse(
+      const Course(
+        id: 42,
+        code: 'OLD01',
+        title: 'Updated Course',
+        credits: 4,
+        status: 'active',
+      ),
+    );
+
+    expect(error, isNull);
+    expect(service.updatedId, 42);
+    expect(service.getCalls, 2);
+    expect(provider.courses.map((course) => course.code), ['NEW01', 'NEW02']);
+    expect(provider.isSaving, isFalse);
+  });
+
+  test('updateCourse rejects a course without an id', () async {
+    final provider = CourseProvider(
+      CourseRepository(_CreatingCourseApiService()),
+    );
+
+    final error = await provider.updateCourse(
+      const Course(code: 'OLD01', title: 'Missing ID', credits: 2),
+    );
+
+    expect(error, 'Course tidak memiliki id');
     expect(provider.isSaving, isFalse);
   });
 }

@@ -109,4 +109,53 @@ void main() {
       ),
     );
   });
+
+  test('updateCourse sends a PUT request with complete course data', () async {
+    final client = MockClient((request) async {
+      expect(request.method, 'PUT');
+      expect(request.url.toString(), 'https://example.com/courses/42');
+      expect(request.headers['Content-Type'], 'application/json');
+      expect(jsonDecode(request.body), {
+        'code': 'MOB01',
+        'title': 'Updated Course',
+        'credits': 4,
+        'status': 'active',
+      });
+      return http.Response('', 204);
+    });
+
+    await CourseApiService('https://example.com', client: client).updateCourse(
+      42,
+      const Course(
+        id: 42,
+        code: 'MOB01',
+        title: 'Updated Course',
+        credits: 4,
+        status: 'active',
+      ),
+    );
+  });
+
+  test('updateCourse shows the API message on failure', () async {
+    final client = MockClient(
+      (_) async => http.Response(
+        jsonEncode({'error': 'Course not found', 'status': 404}),
+        404,
+      ),
+    );
+
+    await expectLater(
+      CourseApiService('https://example.com', client: client).updateCourse(
+        999,
+        const Course(code: 'MOB99', title: 'Missing', credits: 2),
+      ),
+      throwsA(
+        isA<Exception>().having(
+          (error) => error.toString(),
+          'message',
+          contains('Course not found (HTTP 404)'),
+        ),
+      ),
+    );
+  });
 }

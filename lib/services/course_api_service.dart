@@ -40,6 +40,24 @@ class CourseApiService {
     throw Exception(_messageFrom(response, 'Gagal membuat course'));
   }
 
+  Future<void> updateCourse(int id, Course course) async {
+    final uri = Uri.parse('$baseUrl/courses/$id');
+    final response =
+        await (client?.put(
+              uri,
+              headers: {'Content-Type': 'application/json'},
+              body: jsonEncode(course.toJson()),
+            ) ??
+            http.put(
+              uri,
+              headers: {'Content-Type': 'application/json'},
+              body: jsonEncode(course.toJson()),
+            ));
+    if (response.statusCode < 200 || response.statusCode >= 300) {
+      throw Exception(_messageFrom(response, 'Gagal memperbarui course'));
+    }
+  }
+
   String _messageFrom(http.Response response, String fallback) {
     try {
       final body = jsonDecode(response.body) as Map<String, dynamic>;

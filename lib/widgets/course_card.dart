@@ -70,14 +70,14 @@ class CourseCard extends StatelessWidget {
         color: Colors.white,
         borderRadius: BorderRadius.circular(18),
         border: Border.all(
-          color: isFavorite ? Colors.red.withOpacity(0.3) : const Color(0xFFE2E8F0),
+          color: isFavorite ? Colors.red.withValues(alpha: 0.3) : const Color(0xFFE2E8F0),
           width: isFavorite ? 1.5 : 1,
         ),
         boxShadow: [
           BoxShadow(
             color: isFavorite
-                ? Colors.red.withOpacity(0.08)
-                : const Color(0xFF0F172A).withOpacity(0.04),
+                ? Colors.red.withValues(alpha: 0.08)
+                : const Color(0xFF0F172A).withValues(alpha: 0.04),
             blurRadius: 12,
             offset: const Offset(0, 4),
           ),
@@ -105,7 +105,7 @@ class CourseCard extends StatelessWidget {
                       decoration: BoxDecoration(
                         gradient: LinearGradient(
                           colors: [
-                            accentColor.withOpacity(0.85),
+                            accentColor.withValues(alpha: 0.85),
                             accentColor,
                           ],
                           begin: Alignment.topLeft,
@@ -114,7 +114,7 @@ class CourseCard extends StatelessWidget {
                         borderRadius: BorderRadius.circular(12),
                         boxShadow: [
                           BoxShadow(
-                            color: accentColor.withOpacity(0.3),
+                            color: accentColor.withValues(alpha: 0.3),
                             blurRadius: 8,
                             offset: const Offset(0, 3),
                           ),
@@ -190,7 +190,7 @@ class CourseCard extends StatelessWidget {
                         onPressed: onFavoriteTap,
                         style: IconButton.styleFrom(
                           backgroundColor: isFavorite
-                              ? Colors.red.withOpacity(0.1)
+                              ? Colors.red.withValues(alpha: 0.1)
                               : const Color(0xFFF8FAFC),
                         ),
                         icon: Icon(

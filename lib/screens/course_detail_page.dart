@@ -3,7 +3,6 @@ import 'package:provider/provider.dart';
 
 import '../identity.dart';
 import '../providers/course_provider.dart';
-import '../widgets/identity_banner.dart';
 
 class CourseDetailPage extends StatelessWidget {
   final Map<String, dynamic> course;
@@ -88,10 +87,7 @@ class CourseDetailPage extends StatelessWidget {
               padding: const EdgeInsets.fromLTRB(24, 20, 24, 30),
               decoration: BoxDecoration(
                 gradient: LinearGradient(
-                  colors: [
-                    accentColor,
-                    accentColor.withOpacity(0.8),
-                  ],
+                  colors: [accentColor, accentColor.withValues(alpha: 0.8)],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 ),
@@ -103,9 +99,12 @@ class CourseDetailPage extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 10,
+                          vertical: 4,
+                        ),
                         decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.2),
+                          color: Colors.white.withValues(alpha: 0.2),
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: Text(
@@ -118,7 +117,10 @@ class CourseDetailPage extends StatelessWidget {
                         ),
                       ),
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 10,
+                          vertical: 4,
+                        ),
                         decoration: BoxDecoration(
                           color: Colors.white,
                           borderRadius: BorderRadius.circular(8),
@@ -141,7 +143,7 @@ class CourseDetailPage extends StatelessWidget {
                       Container(
                         padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.25),
+                          color: Colors.white.withValues(alpha: 0.25),
                           borderRadius: BorderRadius.circular(16),
                         ),
                         child: Icon(
@@ -167,7 +169,7 @@ class CourseDetailPage extends StatelessWidget {
                             Text(
                               '$credits Satuan Kredit Semester (SKS)',
                               style: TextStyle(
-                                color: Colors.white.withOpacity(0.9),
+                                color: Colors.white.withValues(alpha: 0.9),
                                 fontWeight: FontWeight.w500,
                               ),
                             ),
@@ -230,9 +232,17 @@ class CourseDetailPage extends StatelessWidget {
                     ),
                     child: Column(
                       children: [
-                        _buildInfoTile(Icons.tag_rounded, 'Kode Kurikulum', code),
+                        _buildInfoTile(
+                          Icons.tag_rounded,
+                          'Kode Kurikulum',
+                          code,
+                        ),
                         const Divider(height: 1, indent: 56),
-                        _buildInfoTile(Icons.timer_outlined, 'Beban SKS', '$credits SKS'),
+                        _buildInfoTile(
+                          Icons.timer_outlined,
+                          'Beban SKS',
+                          '$credits SKS',
+                        ),
                         const Divider(height: 1, indent: 56),
                         _buildInfoTile(
                           Icons.verified_outlined,
@@ -255,9 +265,11 @@ class CourseDetailPage extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color: cs.primaryContainer.withOpacity(0.4),
+                      color: cs.primaryContainer.withValues(alpha: 0.4),
                       borderRadius: BorderRadius.circular(14),
-                      border: Border.all(color: cs.primary.withOpacity(0.2)),
+                      border: Border.all(
+                        color: cs.primary.withValues(alpha: 0.2),
+                      ),
                     ),
                     child: Row(
                       children: [
@@ -272,9 +284,12 @@ class CourseDetailPage extends StatelessWidget {
                             child: Image.asset(
                               studentPhoto,
                               fit: BoxFit.cover,
-                              errorBuilder: (_, __, ___) => CircleAvatar(
+                              errorBuilder: (_, _, _) => CircleAvatar(
                                 backgroundColor: cs.primary,
-                                child: const Icon(Icons.person_rounded, color: Colors.white),
+                                child: const Icon(
+                                  Icons.person_rounded,
+                                  color: Colors.white,
+                                ),
                               ),
                             ),
                           ),
@@ -317,11 +332,15 @@ class CourseDetailPage extends StatelessWidget {
                             Navigator.pop(context, true);
                           },
                           icon: Icon(
-                            isFav ? Icons.favorite_rounded : Icons.favorite_border_rounded,
+                            isFav
+                                ? Icons.favorite_rounded
+                                : Icons.favorite_border_rounded,
                             color: Colors.white,
                           ),
                           label: Text(
-                            isFav ? 'Tersimpan di Favorit' : 'Pilih sebagai Favorite',
+                            isFav
+                                ? 'Tersimpan di Favorit'
+                                : 'Pilih sebagai Favorite',
                           ),
                           style: FilledButton.styleFrom(
                             backgroundColor: isFav ? Colors.red.shade600 : null,

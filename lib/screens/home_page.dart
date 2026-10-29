@@ -45,7 +45,7 @@ class _HomePageState extends State<HomePage> {
                     borderRadius: BorderRadius.circular(22),
                     boxShadow: [
                       BoxShadow(
-                        color: const Color(0xFF4F46E5).withOpacity(0.35),
+                        color: const Color(0xFF4F46E5).withValues(alpha: 0.35),
                         blurRadius: 18,
                         offset: const Offset(0, 8),
                       ),
@@ -63,7 +63,7 @@ class _HomePageState extends State<HomePage> {
                               vertical: 4,
                             ),
                             decoration: BoxDecoration(
-                              color: Colors.white.withOpacity(0.2),
+                              color: Colors.white.withValues(alpha: 0.2),
                               borderRadius: BorderRadius.circular(20),
                             ),
                             child: const Row(
@@ -102,7 +102,7 @@ class _HomePageState extends State<HomePage> {
                       Text(
                         'Jelajahi mata kuliah, kelola daftar favorit, dan pelajari implementasi responsif serta navigasi aplikasi Flutter.',
                         style: TextStyle(
-                          color: Colors.white.withOpacity(0.9),
+                          color: Colors.white.withValues(alpha: 0.9),
                           fontSize: 13,
                           height: 1.4,
                         ),
@@ -181,7 +181,7 @@ class _HomePageState extends State<HomePage> {
                         border: Border.all(color: const Color(0xFFE2E8F0)),
                         boxShadow: [
                           BoxShadow(
-                            color: const Color(0xFF0F172A).withOpacity(0.03),
+                            color: const Color(0xFF0F172A).withValues(alpha: 0.03),
                             blurRadius: 6,
                             offset: const Offset(0, 2),
                           ),
@@ -280,7 +280,7 @@ class _StatCard extends StatelessWidget {
         border: Border.all(color: const Color(0xFFE2E8F0)),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF0F172A).withOpacity(0.04),
+            color: const Color(0xFF0F172A).withValues(alpha: 0.04),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -292,7 +292,7 @@ class _StatCard extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: iconColor.withOpacity(0.1),
+              color: iconColor.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(10),
             ),
             child: Icon(icon, color: iconColor, size: 20),

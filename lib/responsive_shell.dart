@@ -89,7 +89,7 @@ class _ResponsiveShellState extends State<ResponsiveShell> {
                         padding: const EdgeInsets.symmetric(vertical: 12),
                         child: CircleAvatar(
                           radius: 18,
-                          backgroundColor: cs.primary.withOpacity(0.1),
+                          backgroundColor: cs.primary.withValues(alpha: 0.1),
                           child: Icon(Icons.explore_rounded, color: cs.primary, size: 20),
                         ),
                       ),

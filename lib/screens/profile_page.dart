@@ -40,7 +40,7 @@ class ProfilePage extends StatelessWidget {
                   borderRadius: BorderRadius.circular(24),
                   boxShadow: [
                     BoxShadow(
-                      color: const Color(0xFF312E81).withOpacity(0.3),
+                      color: const Color(0xFF312E81).withValues(alpha: 0.3),
                       blurRadius: 16,
                       offset: const Offset(0, 8),
                     ),
@@ -63,7 +63,7 @@ class ProfilePage extends StatelessWidget {
                           width: 88,
                           height: 88,
                           fit: BoxFit.cover,
-                          errorBuilder: (_, __, ___) => const CircleAvatar(
+                          errorBuilder: (_, _, _) => const CircleAvatar(
                             radius: 44,
                             backgroundColor: Color(0xFF1E1B4B),
                             child: Icon(
@@ -155,7 +155,7 @@ class ProfilePage extends StatelessWidget {
                   border: Border.all(color: const Color(0xFFE2E8F0)),
                   boxShadow: [
                     BoxShadow(
-                      color: const Color(0xFF0F172A).withOpacity(0.04),
+                      color: const Color(0xFF0F172A).withValues(alpha: 0.04),
                       blurRadius: 10,
                       offset: const Offset(0, 4),
                     ),
@@ -216,9 +216,9 @@ class ProfilePage extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.25),
+        color: color.withValues(alpha: 0.25),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: color.withOpacity(0.5)),
+        border: Border.all(color: color.withValues(alpha: 0.5)),
       ),
       child: Text(
         label,

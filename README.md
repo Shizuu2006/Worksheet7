@@ -74,4 +74,9 @@ dan error pada UI, navigasi Favorit, serta sinkronisasi favorit lintas screen.
 ## Repository
 
 Project ini dikerjakan bertahap pada
-[Shizuu2006/Worksheet6](https://github.com/Shizuu2006/Worksheet6).
+[Shizuu2006/Worksheet7](https://github.com/Shizuu2006/Worksheet7).
+
+   ## REST API
+   - Base URL: https://course-api-pearl.vercel.app
+   - GET /courses → 200, array of Course
+   - Field: id (int), code (string), title (string), credits (int), status (planned|active|done)

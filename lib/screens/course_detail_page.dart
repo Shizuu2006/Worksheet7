@@ -11,6 +11,35 @@ class CourseDetailPage extends StatelessWidget {
 
   const CourseDetailPage({super.key, required this.course});
 
+  Future<void> _confirmDelete(BuildContext context, Course course) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('Hapus course?'),
+        content: Text('${course.code} - ${course.title} akan dihapus.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext, false),
+            child: const Text('Batal'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(dialogContext, true),
+            child: const Text('Hapus'),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true || !context.mounted) return;
+
+    final error = await context.read<CourseProvider>().deleteCourse(course);
+    if (!context.mounted) return;
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text(error ?? 'Course dihapus')));
+    if (error == null && Navigator.canPop(context)) {
+      Navigator.pop(context);
+    }
+  }
+
   IconData _getCourseIcon(String code) {
     switch (code) {
       case 'IF101':
@@ -91,6 +120,13 @@ class CourseDetailPage extends StatelessWidget {
             onPressed: () {
               provider.toggleFavorite(code);
             },
+          ),
+          IconButton(
+            tooltip: 'Hapus course',
+            icon: const Icon(Icons.delete_outline),
+            onPressed: current.id == null || provider.isSaving
+                ? null
+                : () => _confirmDelete(context, current),
           ),
           const SizedBox(width: 8),
         ],

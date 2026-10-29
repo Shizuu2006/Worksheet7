@@ -158,4 +158,37 @@ void main() {
       ),
     );
   });
+
+  test('deleteCourse sends DELETE and accepts an empty 204 response', () async {
+    final client = MockClient((request) async {
+      expect(request.method, 'DELETE');
+      expect(request.url.toString(), 'https://example.com/courses/42');
+      return http.Response('', 204);
+    });
+
+    await CourseApiService(
+      'https://example.com',
+      client: client,
+    ).deleteCourse(42);
+  });
+
+  test('deleteCourse shows the API message on failure', () async {
+    final client = MockClient(
+      (_) async => http.Response(
+        jsonEncode({'error': 'Course cannot be deleted', 'status': 409}),
+        409,
+      ),
+    );
+
+    await expectLater(
+      CourseApiService('https://example.com', client: client).deleteCourse(42),
+      throwsA(
+        isA<Exception>().having(
+          (error) => error.toString(),
+          'message',
+          contains('Course cannot be deleted (HTTP 409)'),
+        ),
+      ),
+    );
+  });
 }

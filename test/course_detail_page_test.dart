@@ -16,6 +16,20 @@ class _CourseApiService extends CourseApiService {
   Future<List<Course>> getCourses() async => courses;
 }
 
+class _DeletableCourseApiService extends CourseApiService {
+  _DeletableCourseApiService(this.courses) : super('');
+
+  final List<Course> courses;
+
+  @override
+  Future<List<Course>> getCourses() async => List.of(courses);
+
+  @override
+  Future<void> deleteCourse(int id) async {
+    courses.removeWhere((course) => course.id == id);
+  }
+}
+
 void main() {
   testWidgets('detail shows current provider data and opens edit form', (
     tester,
@@ -51,5 +65,63 @@ void main() {
 
     expect(find.text('Edit Course'), findsOneWidget);
     expect(find.text('Updated Course'), findsOneWidget);
+  });
+
+  testWidgets('delete requires confirmation and removes course and favorite', (
+    tester,
+  ) async {
+    const course = Course(
+      id: 42,
+      code: 'MOB01',
+      title: 'Course to delete',
+      credits: 2,
+    );
+    final service = _DeletableCourseApiService([course]);
+    final provider = CourseProvider(CourseRepository(service));
+    await provider.loadCourses();
+    provider.toggleFavorite(course.code);
+
+    await tester.pumpWidget(
+      ChangeNotifierProvider.value(
+        value: provider,
+        child: MaterialApp(
+          home: Builder(
+            builder: (context) => Scaffold(
+              body: const Text('Course list'),
+              floatingActionButton: FloatingActionButton(
+                onPressed: () => Navigator.push<void>(
+                  context,
+                  MaterialPageRoute<void>(
+                    builder: (_) => const CourseDetailPage(course: course),
+                  ),
+                ),
+                child: const Icon(Icons.open_in_new),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+
+    await tester.tap(find.byIcon(Icons.open_in_new));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byTooltip('Hapus course'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Hapus course?'), findsOneWidget);
+    await tester.tap(find.text('Batal'));
+    await tester.pumpAndSettle();
+    expect(provider.courses, hasLength(1));
+    expect(provider.isFavorite(course.code), isTrue);
+
+    await tester.tap(find.byTooltip('Hapus course'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Hapus'));
+    await tester.pumpAndSettle();
+
+    expect(provider.courses, isEmpty);
+    expect(provider.isFavorite(course.code), isFalse);
+    expect(find.text('Course list'), findsOneWidget);
+    expect(find.text('Course dihapus'), findsOneWidget);
   });
 }

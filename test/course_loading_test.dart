@@ -32,6 +32,8 @@ class _CreatingCourseApiService extends CourseApiService {
 
   int getCalls = 0;
   int? updatedId;
+  int? deletedId;
+  Object? deleteError;
 
   @override
   Future<List<Course>> getCourses() async {
@@ -50,6 +52,12 @@ class _CreatingCourseApiService extends CourseApiService {
   @override
   Future<void> updateCourse(int id, Course course) async {
     updatedId = id;
+  }
+
+  @override
+  Future<void> deleteCourse(int id) async {
+    if (deleteError != null) throw deleteError!;
+    deletedId = id;
   }
 }
 
@@ -174,4 +182,48 @@ void main() {
     expect(error, 'Course tidak memiliki id');
     expect(provider.isSaving, isFalse);
   });
+
+  test('deleteCourse removes favorite and refreshes the course list', () async {
+    final service = _CreatingCourseApiService();
+    final provider = CourseProvider(CourseRepository(service));
+    const course = Course(
+      id: 42,
+      code: 'OLD01',
+      title: 'Old Course',
+      credits: 2,
+    );
+
+    await provider.loadCourses();
+    provider.toggleFavorite(course.code);
+
+    final error = await provider.deleteCourse(course);
+
+    expect(error, isNull);
+    expect(service.deletedId, 42);
+    expect(service.getCalls, 2);
+    expect(provider.courses.map((item) => item.code), ['NEW01', 'NEW02']);
+    expect(provider.isFavorite(course.code), isFalse);
+  });
+
+  test(
+    'deleteCourse leaves favorite unchanged when API deletion fails',
+    () async {
+      final service = _CreatingCourseApiService()
+        ..deleteError = Exception('Gagal menghapus course (HTTP 409)');
+      final provider = CourseProvider(CourseRepository(service));
+      const course = Course(
+        id: 42,
+        code: 'OLD01',
+        title: 'Old Course',
+        credits: 2,
+      );
+
+      provider.toggleFavorite(course.code);
+      final error = await provider.deleteCourse(course);
+
+      expect(error, 'Gagal menghapus course (HTTP 409)');
+      expect(provider.isFavorite(course.code), isTrue);
+      expect(service.getCalls, 0);
+    },
+  );
 }

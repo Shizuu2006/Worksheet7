@@ -78,4 +78,24 @@ class CourseProvider extends ChangeNotifier {
       notifyListeners();
     }
   }
+
+  Future<String?> deleteCourse(Course course) async {
+    _isSaving = true;
+    notifyListeners();
+    try {
+      final id = course.id;
+      if (id == null) {
+        throw Exception('Course tidak memiliki id');
+      }
+      await _repository.deleteCourse(id);
+      favorites.remove(course.code);
+      await loadCourses();
+      return null;
+    } catch (e) {
+      return e.toString().replaceFirst('Exception: ', '');
+    } finally {
+      _isSaving = false;
+      notifyListeners();
+    }
+  }
 }

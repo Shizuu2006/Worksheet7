@@ -58,6 +58,14 @@ class CourseApiService {
     }
   }
 
+  Future<void> deleteCourse(int id) async {
+    final uri = Uri.parse('$baseUrl/courses/$id');
+    final response = await (client?.delete(uri) ?? http.delete(uri));
+    if (response.statusCode < 200 || response.statusCode >= 300) {
+      throw Exception(_messageFrom(response, 'Gagal menghapus course'));
+    }
+  }
+
   String _messageFrom(http.Response response, String fallback) {
     try {
       final body = jsonDecode(response.body) as Map<String, dynamic>;

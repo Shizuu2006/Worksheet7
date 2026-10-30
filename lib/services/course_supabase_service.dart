@@ -36,8 +36,13 @@ class CourseSupabaseService implements CourseDataSource {
   }
 
   @override
-  Future<void> updateCourse(int id, Course course) =>
-      throw UnimplementedError();
+  Future<void> updateCourse(int id, Course course) async {
+    try {
+      await supabase.from('courses').update(course.toJson()).eq('id', id);
+    } on PostgrestException catch (e) {
+      throw Exception('Gagal memperbarui data: ${e.message}');
+    }
+  }
 
   @override
   Future<void> deleteCourse(int id) => throw UnimplementedError();

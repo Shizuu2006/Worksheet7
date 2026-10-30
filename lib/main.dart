@@ -8,9 +8,8 @@ import 'widgets/identity_banner.dart';
 import 'providers/course_provider.dart';
 import 'repositories/course_repository.dart';
 import 'responsive_shell.dart';
-import 'services/course_api_service.dart';
-
-const apiBaseUrl = 'https://course-api-pearl.vercel.app';
+import 'services/course_data_source.dart';
+import 'services/course_supabase_service.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -19,7 +18,8 @@ Future<void> main() async {
     publishableKey: supabaseAnonKey,
   );
 
-  final repository = CourseRepository(CourseApiService(apiBaseUrl));
+  final CourseDataSource dataSource = CourseSupabaseService();
+  final repository = CourseRepository(dataSource);
   runApp(CourseExplorerApp(repository: repository));
 }
 

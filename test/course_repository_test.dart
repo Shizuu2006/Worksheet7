@@ -1,10 +1,11 @@
 import 'package:course_explorer/models/course.dart';
 import 'package:course_explorer/repositories/course_repository.dart';
-import 'package:course_explorer/services/course_api_service.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-class _FakeCourseApiService extends CourseApiService {
-  _FakeCourseApiService(this.courses) : super('');
+import 'helpers/fake_course_data_source.dart';
+
+class _FakeCourseDataSource extends TestCourseDataSource {
+  _FakeCourseDataSource(this.courses);
 
   final List<Course> courses;
 
@@ -22,7 +23,7 @@ void main() {
         status: 'Wajib',
       ),
     ];
-    final repository = CourseRepository(_FakeCourseApiService(expected));
+    final repository = CourseRepository(_FakeCourseDataSource(expected));
 
     final courses = await repository.getCourses();
 

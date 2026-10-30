@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
 
-import 'helpers/fake_course_api_service.dart';
+import 'helpers/fake_course_data_source.dart';
 
 void main() {
   testWidgets('Favorites tab opens on the mobile navigation bar', (
@@ -61,7 +61,7 @@ void main() {
 Future<CourseProvider> _createProviderWithFavorite() async {
   final provider = CourseProvider(
     CourseRepository(
-      FakeCourseApiService(
+      FakeCourseDataSource(
         courses: const [
           Course(
             code: 'IF101',

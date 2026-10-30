@@ -2,13 +2,14 @@ import 'package:course_explorer/models/course.dart';
 import 'package:course_explorer/providers/course_provider.dart';
 import 'package:course_explorer/repositories/course_repository.dart';
 import 'package:course_explorer/screens/course_detail_page.dart';
-import 'package:course_explorer/services/course_api_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
 
-class _CourseApiService extends CourseApiService {
-  _CourseApiService(this.courses) : super('');
+import 'helpers/fake_course_data_source.dart';
+
+class _CourseDataSource extends TestCourseDataSource {
+  _CourseDataSource(this.courses);
 
   final List<Course> courses;
 
@@ -16,9 +17,8 @@ class _CourseApiService extends CourseApiService {
   Future<List<Course>> getCourses() async => courses;
 }
 
-class _DeletableCourseApiService extends CourseApiService {
-  _DeletableCourseApiService(this.courses) : super('');
-
+class _DeletableCourseDataSource extends TestCourseDataSource {
+  _DeletableCourseDataSource(this.courses);
   final List<Course> courses;
 
   @override
@@ -48,7 +48,7 @@ void main() {
       status: 'active',
     );
     final provider = CourseProvider(
-      CourseRepository(_CourseApiService([updated])),
+      CourseRepository(_CourseDataSource([updated])),
     );
     await provider.loadCourses();
 
@@ -76,7 +76,7 @@ void main() {
       title: 'Course to delete',
       credits: 2,
     );
-    final service = _DeletableCourseApiService([course]);
+    final service = _DeletableCourseDataSource([course]);
     final provider = CourseProvider(CourseRepository(service));
     await provider.loadCourses();
     provider.toggleFavorite(course.code);

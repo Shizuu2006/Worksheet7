@@ -4,13 +4,14 @@ import 'package:course_explorer/screens/courses_page.dart';
 import 'package:course_explorer/models/course.dart';
 import 'package:course_explorer/providers/course_provider.dart';
 import 'package:course_explorer/repositories/course_repository.dart';
-import 'package:course_explorer/services/course_api_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
 
-class _CompleterCourseApiService extends CourseApiService {
-  _CompleterCourseApiService(this.result) : super('');
+import 'helpers/fake_course_data_source.dart';
+
+class _CompleterCourseDataSource extends TestCourseDataSource {
+  _CompleterCourseDataSource(this.result);
 
   final Future<List<Course>> result;
 
@@ -18,18 +19,14 @@ class _CompleterCourseApiService extends CourseApiService {
   Future<List<Course>> getCourses() => result;
 }
 
-class _FailingCourseApiService extends CourseApiService {
-  _FailingCourseApiService() : super('');
-
+class _FailingCourseDataSource extends TestCourseDataSource {
   @override
   Future<List<Course>> getCourses() async {
     throw Exception('Asset tidak dapat dibaca');
   }
 }
 
-class _CreatingCourseApiService extends CourseApiService {
-  _CreatingCourseApiService() : super('');
-
+class _CreatingCourseDataSource extends TestCourseDataSource {
   int getCalls = 0;
   int? updatedId;
   int? deletedId;
@@ -67,7 +64,7 @@ void main() {
   ) async {
     final result = Completer<List<Course>>();
     final provider = CourseProvider(
-      CourseRepository(_CompleterCourseApiService(result.future)),
+      CourseRepository(_CompleterCourseDataSource(result.future)),
     );
     final loading = provider.loadCourses();
 
@@ -100,7 +97,7 @@ void main() {
     tester,
   ) async {
     final provider = CourseProvider(
-      CourseRepository(_FailingCourseApiService()),
+      CourseRepository(_FailingCourseDataSource()),
     );
     await provider.loadCourses();
 
@@ -117,7 +114,7 @@ void main() {
 
   testWidgets('CoursesPage shows an explicit empty state', (tester) async {
     final provider = CourseProvider(
-      CourseRepository(_CompleterCourseApiService(Future.value([]))),
+      CourseRepository(_CompleterCourseDataSource(Future.value([]))),
     );
     await provider.loadCourses();
 
@@ -132,7 +129,7 @@ void main() {
   });
 
   test('createCourse refreshes the course list after creation', () async {
-    final service = _CreatingCourseApiService();
+    final service = _CreatingCourseDataSource();
     final provider = CourseProvider(CourseRepository(service));
 
     await provider.loadCourses();
@@ -149,7 +146,7 @@ void main() {
   });
 
   test('updateCourse sends the id and refreshes the course list', () async {
-    final service = _CreatingCourseApiService();
+    final service = _CreatingCourseDataSource();
     final provider = CourseProvider(CourseRepository(service));
 
     await provider.loadCourses();
@@ -172,7 +169,7 @@ void main() {
 
   test('updateCourse rejects a course without an id', () async {
     final provider = CourseProvider(
-      CourseRepository(_CreatingCourseApiService()),
+      CourseRepository(_CreatingCourseDataSource()),
     );
 
     final error = await provider.updateCourse(
@@ -184,7 +181,7 @@ void main() {
   });
 
   test('deleteCourse removes favorite and refreshes the course list', () async {
-    final service = _CreatingCourseApiService();
+    final service = _CreatingCourseDataSource();
     final provider = CourseProvider(CourseRepository(service));
     const course = Course(
       id: 42,
@@ -208,7 +205,7 @@ void main() {
   test(
     'deleteCourse leaves favorite unchanged when API deletion fails',
     () async {
-      final service = _CreatingCourseApiService()
+      final service = _CreatingCourseDataSource()
         ..deleteError = Exception('Gagal menghapus course (HTTP 409)');
       final provider = CourseProvider(CourseRepository(service));
       const course = Course(

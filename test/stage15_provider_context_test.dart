@@ -1,15 +1,16 @@
 import 'package:course_explorer/providers/course_provider.dart';
 import 'package:course_explorer/repositories/course_repository.dart';
-import 'package:course_explorer/services/course_api_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
+
+import 'helpers/fake_course_data_source.dart';
 
 void main() {
   testWidgets('a context above the provider cannot read CourseProvider', (
     tester,
   ) async {
-    final provider = CourseProvider(CourseRepository(CourseApiService('')));
+    final provider = CourseProvider(CourseRepository(TestCourseDataSource()));
 
     await tester.pumpWidget(
       MaterialApp(
@@ -29,7 +30,7 @@ void main() {
   });
 
   testWidgets('a descendant context can read CourseProvider', (tester) async {
-    final provider = CourseProvider(CourseRepository(CourseApiService('')));
+    final provider = CourseProvider(CourseRepository(TestCourseDataSource()));
 
     await tester.pumpWidget(
       ChangeNotifierProvider.value(
@@ -52,7 +53,7 @@ void main() {
   testWidgets('watch rebuilds the UI after favorite state changes', (
     tester,
   ) async {
-    final provider = CourseProvider(CourseRepository(CourseApiService('')));
+    final provider = CourseProvider(CourseRepository(TestCourseDataSource()));
 
     await tester.pumpWidget(
       ChangeNotifierProvider.value(

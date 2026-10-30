@@ -1,82 +1,99 @@
-# Course Explorer
+# Course Data Manager
 
-Aplikasi Flutter untuk menjelajahi mata kuliah, melihat detail, dan mengelola
-favorit. Project ini mendemonstrasikan pemisahan model, service, repository,
-Provider, screen, dan widget, dengan navigasi yang menyesuaikan ukuran layar.
+**I Kadek Agus Mertha Kusuma - 2415051054 - PTI 5C**
+
+Aplikasi Flutter untuk mengelola data mata kuliah (CRUD) dengan Supabase
+sebagai backend aktif. Project ini dikembangkan dari Course Explorer v2 dan
+mendemonstrasikan pemisahan data source, repository, provider, dan UI.
 
 ## Fitur
 
-- Memuat data mata kuliah dari asset JSON.
-- Menampilkan state loading, error dengan aksi coba lagi, dan daftar mata kuliah.
-- Mencari dan memfilter daftar berdasarkan kategori atau favorit.
-- Mengelola favorit bersama dari daftar, halaman detail, dan halaman Favorit.
-- Menampilkan navigasi bawah pada layout sempit dan NavigationRail pada layout
-  lebar.
-- Menampilkan nama dan NIM mahasiswa pada UI.
+- Membaca daftar course dari tabel `courses` di Supabase.
+- Menambah, mengedit, dan menghapus course; penghapusan memakai dialog
+  konfirmasi.
+- Menampilkan state loading, empty, dan error dengan aksi Retry.
+- Menampilkan pesan hasil operasi melalui SnackBar.
+- Mencari dan memfilter course serta mengelola favorites berdasarkan `code`.
+- Menampilkan daftar dan detail course, serta identitas mahasiswa di UI.
+- Menyesuaikan navigasi dengan ukuran layar: NavigationBar pada layar sempit
+  dan NavigationRail pada layar lebar.
 
-Favorit dikelola di memori oleh `CourseProvider`; statusnya tidak disimpan
+Favorites dikelola di memori oleh `CourseProvider`, sehingga tidak disimpan
 permanen setelah aplikasi ditutup.
 
-## Arsitektur dan Struktur Folder
+## Cara Menjalankan
 
-Alur pemuatan data:
+Pastikan Flutter SDK tersedia dan project Supabase telah memiliki tabel
+`courses` dengan kolom yang sesuai model. Kemudian:
+
+1. Jalankan `flutter pub get`.
+2. Isi `lib/config/supabase_config.dart` dengan Project URL dan publishable
+   key atau anon key Supabase.
+3. Jalankan `flutter run`.
+
+Jangan masukkan database password atau `service_role` key ke aplikasi Flutter.
+Publishable/anon key digunakan di client; akses data tetap harus dilindungi
+dengan konfigurasi Row Level Security (RLS) dan policy yang sesuai.
+
+## Arsitektur
+
+Alur data aplikasi:
 
 ```text
-CoursesPage
+UI (screens/widgets)
     -> CourseProvider
         -> CourseRepository
-            -> CourseService
-                -> assets/data/student_data.json
+            -> CourseDataSource
+                -> CourseSupabaseService (aktif)
+                -> CourseApiService (REST alternatif)
 ```
+
+- `CourseDataSource`: kontrak untuk operasi baca, tambah, ubah, dan hapus.
+- `CourseSupabaseService`: implementasi data source untuk tabel Supabase
+  `courses`.
+- `CourseApiService`: implementasi data source alternatif untuk REST API
+  latihan.
+- `CourseRepository`: perantara antara provider dan data source.
+- `CourseProvider`: mengelola data course, favorites, loading/error state,
+  dan operasi CRUD.
+- Data source aktif dipilih di `lib/main.dart`; saat ini menggunakan
+  `CourseSupabaseService`.
+
+## Backend
+
+- **Supabase:** PostgreSQL, tabel `courses`; URL dan key client dikonfigurasi
+  secara lokal di `lib/config/supabase_config.dart`.
+- **REST API latihan (alternatif):** `https://course-api-pearl.vercel.app`.
+  Implementasi `CourseApiService` mengirim permintaan CRUD ke endpoint
+  `/courses`.
+
+RLS dan policy adalah kontrol akses di backend. Pastikan policy yang aktif
+sesuai kebutuhan praktikum dan jangan menganggap satu policy saja sebagai
+keseluruhan konfigurasi akses: pada pengujian, operasi insert masih berhasil
+setelah policy `lab_insert` dihapus, yang menunjukkan kemungkinan ada policy
+INSERT lain yang juga mengizinkan operasi.
+
+## Struktur Project
 
 | Lokasi | Tanggung jawab |
 | --- | --- |
-| `lib/models/` | Model bertipe kuat, termasuk parsing JSON ke `Course`. |
-| `lib/services/` | Mengakses sumber data, seperti asset JSON, dan mengubahnya menjadi model. |
-| `lib/repositories/` | Menyediakan kontrak akses data antara Provider dan service. |
-| `lib/providers/` | Menyimpan shared state dan async state; memberi tahu UI melalui `notifyListeners()`. |
-| `lib/screens/` | Halaman aplikasi seperti Home, Courses, Favorit, Profile, dan detail. |
-| `lib/widgets/` | Komponen UI yang dapat digunakan ulang, seperti kartu mata kuliah dan banner identitas. |
-| `lib/experiments/` | Halaman demo untuk konsep state management dan arsitektur dari tahapan worksheet. |
-| `assets/data/` | Data mata kuliah dalam format JSON. |
-| `assets/images/` | Gambar yang digunakan aplikasi. |
-| `test/` | Unit test, widget test, dan test integrasi. |
-| `docs/catatan-tahap.md` | Catatan pengerjaan dan hasil pembelajaran setiap tahap. |
+| `lib/models/` | Model bertipe kuat dan parsing JSON ke `Course`. |
+| `lib/services/` | Kontrak data source dan implementasi Supabase/REST. |
+| `lib/repositories/` | Perantara akses data antara provider dan service. |
+| `lib/providers/` | Shared state, operasi asynchronous, dan notifikasi UI. |
+| `lib/screens/` | Halaman Home, Courses, detail, form, Favorites, dan Profile. |
+| `lib/widgets/` | Komponen UI reusable seperti course card dan error view. |
+| `lib/config/` | Konfigurasi URL dan key client Supabase. |
+| `test/` | Widget test dan test untuk alur pemuatan/operasi course. |
 
-`CourseProvider` dibuat di atas `MaterialApp` pada `lib/main.dart`, sehingga
-screen dan halaman detail dapat membaca state yang sama. Widget yang
-menampilkan perubahan menggunakan `watch` atau `Consumer`; aksi mengubah state
-menggunakan `read`. Halaman daftar menampilkan indikator loading, pesan error
-beserta tombol coba lagi, atau daftar hasil ketika pemuatan berhasil.
-
-## Menjalankan Project
-
-Pastikan Flutter SDK tersedia, lalu jalankan dari root project:
-
-```sh
-flutter pub get
-flutter run
-```
-
-Data mata kuliah dimuat dari `assets/data/student_data.json`, yang sudah
-didaftarkan pada bagian `assets` di `pubspec.yaml`.
-
-## Menjalankan Test dan Analisis
+## Test dan Analisis
 
 ```sh
 flutter test
 flutter analyze
 ```
 
-Test mencakup parsing service, repository, notifikasi Provider, state loading
-dan error pada UI, navigasi Favorit, serta sinkronisasi favorit lintas screen.
-
 ## Repository
 
 Project ini dikerjakan bertahap pada
 [Shizuu2006/Worksheet7](https://github.com/Shizuu2006/Worksheet7).
-
-   ## REST API
-   - Base URL: https://course-api-pearl.vercel.app
-   - GET /courses → 200, array of Course
-   - Field: id (int), code (string), title (string), credits (int), status (planned|active|done)

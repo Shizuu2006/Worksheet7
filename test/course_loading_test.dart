@@ -7,6 +7,7 @@ import 'package:course_explorer/repositories/course_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
+import 'package:course_explorer/widgets/error_view.dart';
 
 import 'helpers/fake_course_data_source.dart';
 
@@ -110,6 +111,34 @@ void main() {
 
     expect(find.textContaining('Asset tidak dapat dibaca'), findsOneWidget);
     expect(find.text('Retry'), findsOneWidget);
+  });
+
+  testWidgets('ErrorView keeps retry reachable in a short viewport', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(400, 180);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    var retried = false;
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: ErrorView(
+            message: 'Gagal membaca database: koneksi tidak tersedia',
+            onRetry: () => retried = true,
+          ),
+        ),
+      ),
+    );
+
+    await tester.ensureVisible(find.text('Retry'));
+    await tester.tap(find.text('Retry'));
+    await tester.pump();
+
+    expect(retried, isTrue);
+    expect(tester.takeException(), isNull);
   });
 
   testWidgets('CoursesPage shows an explicit empty state', (tester) async {

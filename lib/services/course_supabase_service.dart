@@ -19,7 +19,21 @@ class CourseSupabaseService implements CourseDataSource {
   }
 
   @override
-  Future<Course> createCourse(Course course) => throw UnimplementedError();
+  Future<Course> createCourse(Course course) async {
+    try {
+      final row = await supabase
+          .from('courses')
+          .insert(course.toJson())
+          .select()
+          .single();
+      return Course.fromJson(row);
+    } on PostgrestException catch (e) {
+      if (e.code == '23505') {
+        throw Exception('Kode course sudah dipakai');
+      }
+      throw Exception('Gagal menambah data: ${e.message}');
+    }
+  }
 
   @override
   Future<void> updateCourse(int id, Course course) =>

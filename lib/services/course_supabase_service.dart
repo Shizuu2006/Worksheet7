@@ -45,5 +45,11 @@ class CourseSupabaseService implements CourseDataSource {
   }
 
   @override
-  Future<void> deleteCourse(int id) => throw UnimplementedError();
+  Future<void> deleteCourse(int id) async {
+    try {
+      await supabase.from('courses').delete().eq('id', id);
+    } on PostgrestException catch (e) {
+      throw Exception('Gagal menghapus data: ${e.message}');
+    }
+  }
 }

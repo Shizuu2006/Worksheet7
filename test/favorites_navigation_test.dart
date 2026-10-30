@@ -27,6 +27,18 @@ void main() {
     expect(find.text('Pemrograman Mobile'), findsOneWidget);
     expect(find.text('IF101'), findsOneWidget);
 
+    await provider.loadCourses();
+    await tester.pumpAndSettle();
+    expect(find.text('Pemrograman Mobile'), findsOneWidget);
+
+    await tester.tap(find.text('Courses'));
+    await tester.pumpAndSettle();
+    expect(find.byTooltip('Hapus favorit').first, findsOneWidget);
+
+    await tester.tap(find.byIcon(Icons.favorite_border_rounded));
+    await tester.pumpAndSettle();
+    expect(find.text('Pemrograman Mobile'), findsOneWidget);
+
     await tester.tap(find.byTooltip('Hapus dari favorit'));
     await tester.pumpAndSettle();
 
@@ -55,6 +67,27 @@ void main() {
 
     expect(find.text('Pemrograman Mobile'), findsOneWidget);
     expect(find.text('IF101'), findsOneWidget);
+  });
+
+  testWidgets('Navigation rail scrolls when vertical space is limited', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(1000, 400);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    final provider = await _createProviderWithFavorite();
+    await tester.pumpWidget(
+      ChangeNotifierProvider.value(
+        value: provider,
+        child: const MaterialApp(home: ResponsiveShell()),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.byType(NavigationRail), findsOneWidget);
+    expect(tester.takeException(), isNull);
   });
 }
 

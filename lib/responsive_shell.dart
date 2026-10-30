@@ -88,6 +88,7 @@ class _ResponsiveShellState extends State<ResponsiveShell> {
                     NavigationRail(
                       selectedIndex: _index,
                       onDestinationSelected: _select,
+                      scrollable: true,
                       labelType: NavigationRailLabelType.all,
                       backgroundColor: Colors.white,
                       indicatorColor: cs.primaryContainer,

@@ -44,6 +44,13 @@ syarat untuk tahap ini; feature role dan database policy dijelaskan pada tahap
 lanjut di bawah. Supabase tetap menjadi penegak izin yang sebenarnya; perubahan
 role pada UI saja bukan pengamanan data.
 
+Tahap F (`Praktik 2 — Logout dan Session`) menggunakan session Supabase yang
+dipulihkan saat aplikasi dibuka. `AuthGate` menampilkan halaman login jika
+session kosong dan aplikasi utama jika session tersedia, lalu mengikuti
+perubahan status auth. Tombol Logout memanggil `signOut()`, sehingga session
+dihapus dan aplikasi kembali ke halaman login. Pengujian end-to-end perilaku
+session memerlukan project Supabase aktif dan akun untuk login.
+
 ### Supabase
 
 1. Pastikan tabel `courses` sudah ada dan cocok dengan model aplikasi.

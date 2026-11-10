@@ -27,6 +27,7 @@ class ResponsiveShell extends StatefulWidget {
 class _ResponsiveShellState extends State<ResponsiveShell> {
   int _index = 0;
   bool _notificationsStarted = false;
+  bool _isLoggingOut = false;
 
   void _select(int i) => setState(() => _index = i);
 
@@ -70,14 +71,33 @@ class _ResponsiveShellState extends State<ResponsiveShell> {
   }
 
   Future<void> _logout() async {
+    if (_isLoggingOut) return;
+    setState(() => _isLoggingOut = true);
+
     try {
       await AuthService.instance.logout();
-      await NotificationService.instance.dispose();
     } on AuthException catch (error) {
-      if (!mounted) return;
-      messengerKey.currentState?.showSnackBar(
-        SnackBar(content: Text('Logout gagal: ${error.message}')),
-      );
+      if (mounted) {
+        messengerKey.currentState?.showSnackBar(
+          SnackBar(content: Text('Logout gagal: ${error.message}')),
+        );
+      }
+    } on Exception catch (error) {
+      if (mounted) {
+        messengerKey.currentState?.showSnackBar(
+          SnackBar(content: Text('Logout gagal: $error')),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _isLoggingOut = false);
+    }
+
+    if (!AuthService.instance.isLoggedIn) {
+      try {
+        await NotificationService.instance.dispose();
+      } on Exception catch (error) {
+        debugPrint('Gagal membersihkan listener notifikasi: $error');
+      }
     }
   }
 
@@ -145,8 +165,14 @@ class _ResponsiveShellState extends State<ResponsiveShell> {
             actions: [
               IconButton(
                 tooltip: 'Logout',
-                onPressed: _logout,
-                icon: const Icon(Icons.logout),
+                onPressed: _isLoggingOut ? null : _logout,
+                icon: _isLoggingOut
+                    ? const SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      )
+                    : const Icon(Icons.logout),
               ),
             ],
           ),

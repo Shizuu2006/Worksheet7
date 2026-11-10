@@ -1,6 +1,7 @@
 import 'package:course_explorer/identity.dart';
 import 'package:course_explorer/main.dart';
 import 'package:course_explorer/repositories/course_repository.dart';
+import 'package:course_explorer/responsive_shell.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -11,7 +12,10 @@ void main() {
     'courses load through the app layers and favorites stay in sync across screens',
     (tester) async {
       await tester.pumpWidget(
-        CourseExplorerApp(repository: CourseRepository(FakeCourseDataSource())),
+        CourseExplorerApp(
+          repository: CourseRepository(FakeCourseDataSource()),
+          home: const ResponsiveShell(),
+        ),
       );
       await tester.pumpAndSettle();
 

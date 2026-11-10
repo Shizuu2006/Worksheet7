@@ -2,13 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../course_data.dart';
+import '../models/user_profile.dart';
 import '../widgets/feedback_form.dart';
 import '../identity.dart';
 import '../widgets/identity_banner.dart';
 import '../providers/course_provider.dart';
 
 class ProfilePage extends StatelessWidget {
-  const ProfilePage({super.key});
+  const ProfilePage({super.key, this.profile});
+
+  final UserProfile? profile;
 
   @override
   Widget build(BuildContext context) {
@@ -111,6 +114,36 @@ class ProfilePage extends StatelessWidget {
               ),
 
               const SizedBox(height: 16),
+
+              if (profile != null) ...[
+                Card(
+                  child: Column(
+                    children: [
+                      ListTile(
+                        leading: const Icon(Icons.person_outline),
+                        title: const Text('Akun Supabase'),
+                        subtitle: Text(
+                          profile!.name.isEmpty
+                              ? profile!.email
+                              : profile!.name,
+                        ),
+                      ),
+                      ListTile(
+                        leading: const Icon(Icons.email_outlined),
+                        title: const Text('Email'),
+                        subtitle: Text(profile!.email),
+                      ),
+                      ListTile(
+                        leading: const Icon(Icons.badge_outlined),
+                        title: const Text('Role'),
+                        subtitle: Text(profile!.role),
+                      ),
+                    ],
+                  ),
+                ),
+
+                const SizedBox(height: 16),
+              ],
 
               // Quick Stats Row
               Row(

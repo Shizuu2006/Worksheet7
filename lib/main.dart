@@ -4,19 +4,17 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'config/supabase_config.dart';
 import 'app_theme.dart';
-import 'widgets/identity_banner.dart';
+import 'app_keys.dart';
+import 'pages/auth_gate.dart';
 import 'providers/course_provider.dart';
 import 'repositories/course_repository.dart';
-import 'responsive_shell.dart';
 import 'services/course_data_source.dart';
 import 'services/course_supabase_service.dart';
+import 'widgets/identity_banner.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Supabase.initialize(
-    url: supabaseUrl,
-    publishableKey: supabaseAnonKey,
-  );
+  await Supabase.initialize(url: supabaseUrl, publishableKey: supabaseAnonKey);
 
   final CourseDataSource dataSource = CourseSupabaseService();
   final repository = CourseRepository(dataSource);
@@ -24,19 +22,22 @@ Future<void> main() async {
 }
 
 class CourseExplorerApp extends StatelessWidget {
-  const CourseExplorerApp({super.key, required this.repository});
+  const CourseExplorerApp({super.key, required this.repository, this.home});
 
   final CourseRepository repository;
+  final Widget? home;
 
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (_) => CourseProvider(repository)..loadCourses(),
+      create: (_) => CourseProvider(repository),
       child: MaterialApp(
         title: 'Course Explorer',
         debugShowCheckedModeBanner: false,
         theme: appTheme,
-        home: const ResponsiveShell(),
+        navigatorKey: navigatorKey,
+        scaffoldMessengerKey: messengerKey,
+        home: home ?? const AuthGate(),
         routes: {'/stage0': (_) => const Stage0()},
       ),
     );

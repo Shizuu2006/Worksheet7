@@ -2,12 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../models/course.dart';
+import '../models/user_profile.dart';
 import '../providers/course_provider.dart';
 
 class CourseFormPage extends StatefulWidget {
-  const CourseFormPage({super.key, this.course});
+  const CourseFormPage({super.key, this.course, required this.profile});
 
   final Course? course;
+  final UserProfile profile;
 
   @override
   State<CourseFormPage> createState() => _CourseFormPageState();
@@ -42,6 +44,15 @@ class _CourseFormPageState extends State<CourseFormPage> {
 
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
+    final isOwnerOfCourse =
+        widget.course == null || widget.course!.ownerId == widget.profile.id;
+    if (!widget.profile.canManageCourses ||
+        (!widget.profile.isAdmin && !isOwnerOfCourse)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Anda tidak berhak mengelola course ini.')),
+      );
+      return;
+    }
 
     final course = Course(
       id: widget.course?.id,

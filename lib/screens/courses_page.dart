@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../models/course.dart';
+import '../models/user_profile.dart';
 import '../widgets/course_card.dart';
 import '../widgets/error_view.dart';
 import '../widgets/identity_banner.dart';
@@ -10,7 +11,9 @@ import '../identity.dart';
 import '../providers/course_provider.dart';
 
 class CoursesPage extends StatefulWidget {
-  const CoursesPage({super.key});
+  const CoursesPage({super.key, this.profile});
+
+  final UserProfile? profile;
 
   @override
   State<CoursesPage> createState() => _CoursesPageState();
@@ -41,7 +44,9 @@ class _CoursesPageState extends State<CoursesPage> {
   Future<void> _openDetail(BuildContext context, Course course) async {
     final result = await Navigator.push<bool>(
       context,
-      MaterialPageRoute(builder: (_) => CourseDetailPage(course: course)),
+      MaterialPageRoute(
+        builder: (_) => CourseDetailPage(course: course, profile: widget.profile),
+      ),
     );
 
     if (result == true && context.mounted) {

@@ -21,9 +21,13 @@ class CourseSupabaseService implements CourseDataSource {
   @override
   Future<Course> createCourse(Course course) async {
     try {
+      final user = supabase.auth.currentUser;
+      if (user == null) {
+        throw StateError('Login diperlukan untuk menambah course');
+      }
       final row = await supabase
           .from('courses')
-          .insert(course.toJson())
+          .insert({...course.toJson(), 'owner_id': user.id})
           .select()
           .single();
       return Course.fromJson(row);
@@ -38,7 +42,14 @@ class CourseSupabaseService implements CourseDataSource {
   @override
   Future<void> updateCourse(int id, Course course) async {
     try {
-      await supabase.from('courses').update(course.toJson()).eq('id', id);
+      final rows = await supabase
+          .from('courses')
+          .update(course.toJson())
+          .eq('id', id)
+          .select('id');
+      if (rows.isEmpty) {
+        throw StateError('Perubahan ditolak oleh policy RLS atau data tidak ada');
+      }
     } on PostgrestException catch (e) {
       throw Exception('Gagal memperbarui data: ${e.message}');
     }
@@ -47,7 +58,14 @@ class CourseSupabaseService implements CourseDataSource {
   @override
   Future<void> deleteCourse(int id) async {
     try {
-      await supabase.from('courses').delete().eq('id', id);
+      final rows = await supabase
+          .from('courses')
+          .delete()
+          .eq('id', id)
+          .select('id');
+      if (rows.isEmpty) {
+        throw StateError('Penghapusan ditolak oleh policy RLS atau data tidak ada');
+      }
     } on PostgrestException catch (e) {
       throw Exception('Gagal menghapus data: ${e.message}');
     }

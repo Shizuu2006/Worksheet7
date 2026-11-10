@@ -1,4 +1,5 @@
 import 'package:course_explorer/models/course.dart';
+import 'package:course_explorer/models/user_profile.dart';
 import 'package:course_explorer/providers/course_provider.dart';
 import 'package:course_explorer/repositories/course_repository.dart';
 import 'package:course_explorer/screens/course_detail_page.dart';
@@ -55,7 +56,17 @@ void main() {
     await tester.pumpWidget(
       ChangeNotifierProvider.value(
         value: provider,
-        child: const MaterialApp(home: CourseDetailPage(course: original)),
+        child: const MaterialApp(
+          home: CourseDetailPage(
+            course: original,
+            profile: UserProfile(
+              id: 'admin-id',
+              email: 'admin@example.com',
+              name: 'Admin',
+              role: 'admin',
+            ),
+          ),
+        ),
       ),
     );
 
@@ -92,7 +103,15 @@ void main() {
                 onPressed: () => Navigator.push<void>(
                   context,
                   MaterialPageRoute<void>(
-                    builder: (_) => const CourseDetailPage(course: course),
+                    builder: (_) => const CourseDetailPage(
+                      course: course,
+                      profile: UserProfile(
+                        id: 'admin-id',
+                        email: 'admin@example.com',
+                        name: 'Admin',
+                        role: 'admin',
+                      ),
+                    ),
                   ),
                 ),
                 child: const Icon(Icons.open_in_new),
@@ -123,5 +142,38 @@ void main() {
     expect(provider.isFavorite(course.code), isFalse);
     expect(find.text('Course list'), findsOneWidget);
     expect(find.text('Course dihapus'), findsOneWidget);
+  });
+
+  testWidgets('seeker cannot see course management actions', (tester) async {
+    const course = Course(
+      id: 7,
+      code: 'MOB07',
+      title: 'Private Course',
+      credits: 2,
+      ownerId: 'owner-id',
+    );
+    final provider = CourseProvider(
+      CourseRepository(_CourseDataSource([course])),
+    );
+
+    await tester.pumpWidget(
+      ChangeNotifierProvider.value(
+        value: provider,
+        child: const MaterialApp(
+          home: CourseDetailPage(
+            course: course,
+            profile: UserProfile(
+              id: 'seeker-id',
+              email: 'seeker@example.com',
+              name: 'Seeker',
+              role: 'seeker',
+            ),
+          ),
+        ),
+      ),
+    );
+
+    expect(find.byTooltip('Edit course'), findsNothing);
+    expect(find.byTooltip('Hapus course'), findsNothing);
   });
 }

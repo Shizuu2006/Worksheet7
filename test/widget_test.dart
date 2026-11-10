@@ -3,13 +3,17 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:course_explorer/identity.dart';
 import 'package:course_explorer/main.dart';
 import 'package:course_explorer/repositories/course_repository.dart';
+import 'package:course_explorer/responsive_shell.dart';
 
 import 'helpers/fake_course_data_source.dart';
 
 void main() {
   testWidgets('Nama dan NIM mahasiswa tampil di aplikasi', (tester) async {
     await tester.pumpWidget(
-      CourseExplorerApp(repository: CourseRepository(FakeCourseDataSource())),
+      CourseExplorerApp(
+        repository: CourseRepository(FakeCourseDataSource()),
+        home: const ResponsiveShell(),
+      ),
     );
     await tester.pump();
 
@@ -19,7 +23,10 @@ void main() {
 
   testWidgets('Course Explorer renders course list', (tester) async {
     await tester.pumpWidget(
-      CourseExplorerApp(repository: CourseRepository(FakeCourseDataSource())),
+      CourseExplorerApp(
+        repository: CourseRepository(FakeCourseDataSource()),
+        home: const ResponsiveShell(),
+      ),
     );
     await tester.pump();
 

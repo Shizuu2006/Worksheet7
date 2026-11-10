@@ -3,13 +3,19 @@ import 'package:provider/provider.dart';
 
 import '../identity.dart';
 import '../models/course.dart';
+import '../models/user_profile.dart';
 import '../providers/course_provider.dart';
 import 'course_form_page.dart';
 
 class CourseDetailPage extends StatelessWidget {
   final Course course;
+  final UserProfile? profile;
 
-  const CourseDetailPage({super.key, required this.course});
+  const CourseDetailPage({
+    super.key,
+    required this.course,
+    this.profile,
+  });
 
   Future<void> _confirmDelete(BuildContext context, Course course) async {
     final confirmed = await showDialog<bool>(
@@ -94,23 +100,30 @@ class CourseDetailPage extends StatelessWidget {
     final description = current.description;
     final accentColor = _getCourseColor(code);
     final isFav = provider.isFavorite(code);
+    final canManageCurrent =
+        profile?.isAdmin == true ||
+        (profile?.isOwner == true && current.ownerId == profile?.id);
 
     return Scaffold(
       appBar: AppBar(
         title: Text(code),
         actions: [
-          IconButton(
-            tooltip: 'Edit course',
-            icon: const Icon(Icons.edit),
-            onPressed: current.id == null
-                ? null
-                : () => Navigator.push<void>(
-                    context,
-                    MaterialPageRoute<void>(
-                      builder: (_) => CourseFormPage(course: current),
+          if (canManageCurrent)
+            IconButton(
+              tooltip: 'Edit course',
+              icon: const Icon(Icons.edit),
+              onPressed: current.id == null
+                  ? null
+                  : () => Navigator.push<void>(
+                      context,
+                      MaterialPageRoute<void>(
+                        builder: (_) => CourseFormPage(
+                          course: current,
+                          profile: profile!,
+                        ),
+                      ),
                     ),
-                  ),
-          ),
+            ),
           IconButton(
             tooltip: isFav ? 'Hapus dari favorit' : 'Tambah ke favorit',
             icon: Icon(
@@ -121,13 +134,14 @@ class CourseDetailPage extends StatelessWidget {
               provider.toggleFavorite(code);
             },
           ),
-          IconButton(
-            tooltip: 'Hapus course',
-            icon: const Icon(Icons.delete_outline),
-            onPressed: current.id == null || provider.isSaving
-                ? null
-                : () => _confirmDelete(context, current),
-          ),
+          if (canManageCurrent)
+            IconButton(
+              tooltip: 'Hapus course',
+              icon: const Icon(Icons.delete_outline),
+              onPressed: current.id == null || provider.isSaving
+                  ? null
+                  : () => _confirmDelete(context, current),
+            ),
           const SizedBox(width: 8),
         ],
       ),

@@ -1,15 +1,24 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:provider/provider.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
+import 'app_keys.dart';
+import 'models/user_profile.dart';
 import 'screens/courses_page.dart';
 import 'screens/course_form_page.dart';
 import 'screens/favorites_page.dart';
 import 'screens/home_page.dart';
 import 'screens/profile_page.dart';
 import 'providers/course_provider.dart';
+import 'services/auth_service.dart';
+import 'services/notification_service.dart';
 
 class ResponsiveShell extends StatefulWidget {
-  const ResponsiveShell({super.key});
+  const ResponsiveShell({super.key, this.profile});
+
+  final UserProfile? profile;
 
   @override
   State<ResponsiveShell> createState() => _ResponsiveShellState();
@@ -17,8 +26,60 @@ class ResponsiveShell extends StatefulWidget {
 
 class _ResponsiveShellState extends State<ResponsiveShell> {
   int _index = 0;
+  bool _notificationsStarted = false;
 
   void _select(int i) => setState(() => _index = i);
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      context.read<CourseProvider>().loadCourses();
+      if (widget.profile != null) _initializeNotifications();
+    });
+  }
+
+  Future<void> _initializeNotifications() async {
+    if (_notificationsStarted) return;
+    _notificationsStarted = true;
+    try {
+      await NotificationService.instance.initialize();
+    } on FirebaseException catch (error) {
+      debugPrint('FCM belum siap: ${error.message}');
+      _showNotificationSetupMessage();
+    } on PlatformException catch (error) {
+      debugPrint('FCM belum siap: ${error.message}');
+      _showNotificationSetupMessage();
+    } on MissingPluginException catch (error) {
+      debugPrint('FCM tidak tersedia pada platform ini: ${error.message}');
+      _showNotificationSetupMessage();
+    } on UnsupportedError catch (error) {
+      debugPrint('FCM belum siap: $error');
+      _showNotificationSetupMessage();
+    }
+  }
+
+  void _showNotificationSetupMessage() {
+    if (!mounted) return;
+    messengerKey.currentState?.showSnackBar(
+      const SnackBar(
+        content: Text('FCM perlu dikonfigurasi untuk project Firebase ini.'),
+      ),
+    );
+  }
+
+  Future<void> _logout() async {
+    try {
+      await AuthService.instance.logout();
+      await NotificationService.instance.dispose();
+    } on AuthException catch (error) {
+      if (!mounted) return;
+      messengerKey.currentState?.showSnackBar(
+        SnackBar(content: Text('Logout gagal: ${error.message}')),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -28,9 +89,9 @@ class _ResponsiveShellState extends State<ResponsiveShell> {
 
     final List<Widget> pages = [
       HomePage(onNavigateToCourses: () => _select(1)),
-      const CoursesPage(),
-      const FavoritesPage(),
-      const ProfilePage(),
+      CoursesPage(profile: widget.profile),
+      FavoritesPage(profile: widget.profile),
+      ProfilePage(profile: widget.profile),
     ];
 
     return LayoutBuilder(
@@ -81,6 +142,13 @@ class _ResponsiveShellState extends State<ResponsiveShell> {
                 ),
               ],
             ),
+            actions: [
+              IconButton(
+                tooltip: 'Logout',
+                onPressed: _logout,
+                icon: const Icon(Icons.logout),
+              ),
+            ],
           ),
           body: expanded
               ? Row(
@@ -144,12 +212,13 @@ class _ResponsiveShellState extends State<ResponsiveShell> {
                   ],
                 )
               : content,
-          floatingActionButton: _index == 1
+          floatingActionButton:
+              _index == 1 && widget.profile?.canManageCourses == true
               ? FloatingActionButton(
                   onPressed: () => Navigator.push<void>(
                     context,
                     MaterialPageRoute<void>(
-                      builder: (_) => const CourseFormPage(),
+                      builder: (_) => CourseFormPage(profile: widget.profile!),
                     ),
                   ),
                   child: const Icon(Icons.add),

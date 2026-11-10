@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../models/user_profile.dart';
 import '../providers/course_provider.dart';
 import '../widgets/identity_banner.dart';
 import 'course_detail_page.dart';
 
 class FavoritesPage extends StatelessWidget {
-  const FavoritesPage({super.key});
+  const FavoritesPage({super.key, this.profile});
+
+  final UserProfile? profile;
 
   @override
   Widget build(BuildContext context) {
@@ -56,7 +59,10 @@ class FavoritesPage extends StatelessWidget {
                         onTap: () => Navigator.push(
                           context,
                           MaterialPageRoute<void>(
-                            builder: (_) => CourseDetailPage(course: course),
+                            builder: (_) => CourseDetailPage(
+                              course: course,
+                              profile: profile,
+                            ),
                           ),
                         ),
                       ),

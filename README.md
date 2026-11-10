@@ -35,6 +35,66 @@ Jangan masukkan database password atau `service_role` key ke aplikasi Flutter.
 Publishable/anon key digunakan di client; akses data tetap harus dilindungi
 dengan konfigurasi Row Level Security (RLS) dan policy yang sesuai.
 
+## Worksheet 9 — Authentication, Role, RLS, dan FCM
+
+Aplikasi menyediakan register/login Supabase dan memeriksa session saat dibuka.
+Tahap E (`Praktik 1`) menggunakan email, password, konfirmasi password, dan
+alur session langsung ke halaman utama. Pemeriksaan profile/role tidak menjadi
+syarat untuk tahap ini; feature role dan database policy dijelaskan pada tahap
+lanjut di bawah. Supabase tetap menjadi penegak izin yang sebenarnya; perubahan
+role pada UI saja bukan pengamanan data.
+
+### Supabase
+
+1. Pastikan tabel `courses` sudah ada dan cocok dengan model aplikasi.
+2. Jalankan isi `supabase/worksheet9.sql` melalui Supabase SQL Editor. Skrip ini
+   membuat profil otomatis saat pendaftaran, menambahkan `owner_id`, serta
+   mengaktifkan policy RLS untuk course dan token perangkat.
+3. Skrip tersebut mengganti seluruh policy lama pada tabel `courses`, karena
+   policy permissive lama dapat mengizinkan operasi yang dilarang policy baru.
+   Tinjau efek ini sebelum menjalankannya pada database produksi.
+4. Akun baru mendaftar sebagai `seeker` atau `owner`; role `admin` hanya dapat
+   ditetapkan dari SQL Editor oleh administrator.
+5. Untuk latihan, nonaktifkan konfirmasi email pada Supabase Auth agar akun
+   dapat langsung login.
+
+RLS hanya memberi pemilik izin mengubah/menghapus course dengan `owner_id`
+yang cocok. Data course lama yang `owner_id`-nya masih kosong tetap dapat dibaca
+oleh user login, tetapi tidak dapat dikelola owner sebelum kepemilikannya
+diverifikasi dan diisi secara manual.
+
+### Firebase Cloud Messaging
+
+Dependensi Firebase, permission Android 13+, permission request, token device,
+penyimpanan token ke Supabase, serta listener pesan foreground/background sudah
+disiapkan. Sebelum FCM bisa berjalan, hubungkan project Firebase pribadi:
+
+1. Jalankan `flutterfire configure` pada root project dan pilih project serta
+   platform yang benar.
+2. Ikuti petunjuk FlutterFire untuk memasang konfigurasi native, misalnya
+   `google-services.json` untuk Android dan `GoogleService-Info.plist` untuk
+   iOS. Project tidak menyertakan kredensial Firebase pribadi.
+3. Jalankan SQL `supabase/worksheet9.sql` agar tabel token dan policy tersedia.
+4. Jalankan aplikasi pada perangkat/emulator yang mendukung Google Play
+   Services. Status permission dan FCM token tercetak di debug console.
+5. Kirim pesan uji dari Firebase Console → Cloud Messaging menggunakan token
+   terbaru. Token bersifat dinamis; jangan commit atau membagikannya.
+
+Jika project Firebase belum dikonfigurasi, aplikasi tetap membuka fitur
+Supabase dan menampilkan bahwa FCM perlu disiapkan.
+
+### Pengujian
+
+```sh
+flutter test
+flutter analyze
+```
+
+Uji juga dua akun berbeda: owner pertama harus dapat mengelola course miliknya,
+sedangkan owner kedua harus mendapat operasi ditolak saat mencoba mengubah atau
+menghapus data tersebut. Uji FCM memerlukan konfigurasi Firebase dan perangkat
+yang mendukung push notification.
+
 ## Arsitektur
 
 Alur data aplikasi:

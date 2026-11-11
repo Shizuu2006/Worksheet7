@@ -15,6 +15,7 @@ class _RegisterPageState extends State<RegisterPage> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmationController = TextEditingController();
+  String _selectedRole = 'seeker';
   bool _isSubmitting = false;
   String? _errorMessage;
 
@@ -37,6 +38,7 @@ class _RegisterPageState extends State<RegisterPage> {
       final response = await AuthService.instance.register(
         email: _emailController.text.trim(),
         password: _passwordController.text,
+        role: _selectedRole,
       );
       if (!mounted) return;
       if (response.session != null) {
@@ -108,6 +110,29 @@ class _RegisterPageState extends State<RegisterPage> {
                         : null;
                   },
                   onFieldSubmitted: (_) => _register(),
+                ),
+                const SizedBox(height: 12),
+                DropdownButtonFormField<String>(
+                  initialValue: _selectedRole,
+                  isExpanded: true,
+                  decoration: const InputDecoration(labelText: 'Role'),
+                  items: const [
+                    DropdownMenuItem(
+                      value: 'seeker',
+                      child: Text('Seeker - melihat course'),
+                    ),
+                    DropdownMenuItem(
+                      value: 'owner',
+                      child: Text('Owner - mengelola course'),
+                    ),
+                  ],
+                  onChanged: _isSubmitting
+                      ? null
+                      : (role) {
+                          if (role != null) {
+                            setState(() => _selectedRole = role);
+                          }
+                        },
                 ),
                 if (_errorMessage != null) ...[
                   const SizedBox(height: 12),

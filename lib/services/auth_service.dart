@@ -12,8 +12,17 @@ class AuthService {
   Future<AuthResponse> register({
     required String email,
     required String password,
+    required String role,
   }) {
-    return _client.auth.signUp(email: email, password: password);
+    if (!const {'seeker', 'owner'}.contains(role)) {
+      throw ArgumentError.value(role, 'role', 'Role registrasi tidak valid');
+    }
+
+    return _client.auth.signUp(
+      email: email,
+      password: password,
+      data: {'role': role},
+    );
   }
 
   Future<AuthResponse> login({

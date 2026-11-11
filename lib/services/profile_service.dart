@@ -8,14 +8,11 @@ class ProfileService {
 
   final SupabaseClient _client;
 
-  Future<UserProfile?> getMyProfile() async {
-    final user = _client.auth.currentUser;
-    if (user == null) return null;
-
+  Future<UserProfile?> getProfile(String userId) async {
     final data = await _client
         .from('profiles')
         .select('id, email, name, role')
-        .eq('id', user.id)
+        .eq('id', userId)
         .maybeSingle();
 
     if (data == null) return null;

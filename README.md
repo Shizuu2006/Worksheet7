@@ -51,6 +51,15 @@ perubahan status auth. Tombol Logout memanggil `signOut()`, sehingga session
 dihapus dan aplikasi kembali ke halaman login. Pengujian end-to-end perilaku
 session memerlukan project Supabase aktif dan akun untuk login.
 
+Tahap G (`Praktik 3 — Menambahkan Role Pengguna`) mengambil role dari tabel
+`profiles` setelah session aktif. Form registrasi mengirim role `seeker` atau
+`owner` sebagai metadata agar trigger pada SQL membuat profil dengan role
+tersebut; role `admin` tidak tersedia untuk dipilih saat registrasi dan hanya
+dapat ditetapkan administrator. Akses fitur di UI mengikuti profile yang
+dimuat, sedangkan RLS Supabase tetap menjadi pengaman otoritatif. Jika profile
+tidak dapat dimuat, aplikasi menampilkan error dan pilihan coba lagi/logout,
+bukan memberikan akses dengan role default.
+
 ### Supabase
 
 1. Pastikan tabel `courses` sudah ada dan cocok dengan model aplikasi.

@@ -36,6 +36,17 @@ void main() {
     expect(find.text('Konfirmasi password tidak sama'), findsOneWidget);
   });
 
+  testWidgets('register offers seeker and owner roles only', (tester) async {
+    await tester.pumpWidget(const MaterialApp(home: RegisterPage()));
+
+    await tester.tap(find.byType(DropdownButtonFormField<String>));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Seeker - melihat course'), findsWidgets);
+    expect(find.text('Owner - mengelola course'), findsOneWidget);
+    expect(find.text('Admin'), findsNothing);
+  });
+
   testWidgets('login validates email and password before authentication', (
     tester,
   ) async {

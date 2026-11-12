@@ -23,8 +23,12 @@ void main() {
     });
 
     expect(seeker.canManageCourses, isFalse);
+    expect(seeker.canManageCourse('user-1'), isFalse);
     expect(owner.canManageCourses, isTrue);
+    expect(owner.canManageCourse('user-2'), isTrue);
+    expect(owner.canManageCourse('user-3'), isFalse);
     expect(admin.canManageCourses, isTrue);
+    expect(admin.canManageCourse('user-2'), isTrue);
   });
 
   test('profile rejects an unknown role', () {

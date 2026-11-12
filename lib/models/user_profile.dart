@@ -16,6 +16,9 @@ class UserProfile {
   bool get isAdmin => role == 'admin';
   bool get canManageCourses => isOwner || isAdmin;
 
+  bool canManageCourse(String? ownerId) =>
+      isAdmin || (isOwner && ownerId == id);
+
   factory UserProfile.fromMap(Map<String, dynamic> map) {
     final role = map['role'] as String? ?? 'seeker';
     if (!const {'seeker', 'owner', 'admin'}.contains(role)) {

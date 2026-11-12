@@ -3,6 +3,7 @@ import 'package:course_explorer/models/user_profile.dart';
 import 'package:course_explorer/providers/course_provider.dart';
 import 'package:course_explorer/repositories/course_repository.dart';
 import 'package:course_explorer/screens/course_detail_page.dart';
+import 'package:course_explorer/screens/course_form_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
@@ -175,5 +176,78 @@ void main() {
 
     expect(find.byTooltip('Edit course'), findsNothing);
     expect(find.byTooltip('Hapus course'), findsNothing);
+    expect(find.byTooltip('Tambah ke favorit'), findsOneWidget);
+  });
+
+  testWidgets('owner can manage only their own course', (tester) async {
+    const ownCourse = Course(
+      id: 8,
+      code: 'MOB08',
+      title: 'Owner Course',
+      credits: 2,
+      ownerId: 'owner-id',
+    );
+    final provider = CourseProvider(
+      CourseRepository(_CourseDataSource([ownCourse])),
+    );
+
+    await tester.pumpWidget(
+      ChangeNotifierProvider.value(
+        value: provider,
+        child: const MaterialApp(
+          home: CourseDetailPage(
+            course: ownCourse,
+            profile: UserProfile(
+              id: 'owner-id',
+              email: 'owner@example.com',
+              name: 'Owner',
+              role: 'owner',
+            ),
+          ),
+        ),
+      ),
+    );
+
+    expect(find.byTooltip('Edit course'), findsOneWidget);
+    expect(find.byTooltip('Hapus course'), findsOneWidget);
+  });
+
+  testWidgets('owner cannot open a management form for another owner course', (
+    tester,
+  ) async {
+    const foreignCourse = Course(
+      id: 9,
+      code: 'MOB09',
+      title: 'Another Owner Course',
+      credits: 2,
+      ownerId: 'different-owner-id',
+    );
+    final provider = CourseProvider(
+      CourseRepository(_CourseDataSource([foreignCourse])),
+    );
+
+    await tester.pumpWidget(
+      ChangeNotifierProvider.value(
+        value: provider,
+        child: const MaterialApp(
+          home: CourseFormPage(
+            course: foreignCourse,
+            profile: UserProfile(
+              id: 'owner-id',
+              email: 'owner@example.com',
+              name: 'Owner',
+              role: 'owner',
+            ),
+          ),
+        ),
+      ),
+    );
+
+    expect(find.text('Akses Ditolak'), findsOneWidget);
+    expect(
+      find.text('Anda tidak berhak mengelola course ini.'),
+      findsOneWidget,
+    );
+    expect(find.text('Simpan'), findsNothing);
   });
 }

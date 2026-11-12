@@ -45,11 +45,7 @@ begin
     new.id,
     new.email,
     coalesce(new.raw_user_meta_data->>'name', ''),
-    case
-      when new.raw_user_meta_data->>'role' in ('seeker', 'owner')
-        then new.raw_user_meta_data->>'role'
-      else 'seeker'
-    end
+    'seeker'
   )
   on conflict (id) do nothing;
   return new;

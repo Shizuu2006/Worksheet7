@@ -52,13 +52,19 @@ dihapus dan aplikasi kembali ke halaman login. Pengujian end-to-end perilaku
 session memerlukan project Supabase aktif dan akun untuk login.
 
 Tahap G (`Praktik 3 — Menambahkan Role Pengguna`) mengambil role dari tabel
-`profiles` setelah session aktif. Form registrasi mengirim role `seeker` atau
-`owner` sebagai metadata agar trigger pada SQL membuat profil dengan role
-tersebut; role `admin` tidak tersedia untuk dipilih saat registrasi dan hanya
-dapat ditetapkan administrator. Akses fitur di UI mengikuti profile yang
-dimuat, sedangkan RLS Supabase tetap menjadi pengaman otoritatif. Jika profile
-tidak dapat dimuat, aplikasi menampilkan error dan pilihan coba lagi/logout,
-bukan memberikan akses dengan role default.
+`profiles` setelah session aktif. Pendaftar baru otomatis mendapat role
+`seeker`; role `owner` atau `admin` harus diberikan oleh administrator, bukan
+dipilih saat registrasi. Trigger SQL mengabaikan metadata role dari client.
+Akses fitur di UI mengikuti profile yang dimuat, sedangkan RLS Supabase tetap
+menjadi pengaman otoritatif. Jika profile tidak dapat dimuat, aplikasi
+menampilkan error dan pilihan coba lagi/logout, bukan memberikan akses dengan
+role default.
+
+Tahap H (`Praktik 4 — Authorization pada UI`) menyembunyikan aksi tambah
+course dari `seeker`, dan hanya menampilkan aksi edit/hapus bagi admin atau
+owner yang memiliki course tersebut. Halaman form juga menolak akses langsung
+jika role atau kepemilikan tidak sesuai. Pemeriksaan UI meningkatkan kejelasan
+pengalaman pengguna; RLS tetap wajib karena UI bukan batas keamanan backend.
 
 ### Supabase
 
@@ -69,10 +75,16 @@ bukan memberikan akses dengan role default.
 3. Skrip tersebut mengganti seluruh policy lama pada tabel `courses`, karena
    policy permissive lama dapat mengizinkan operasi yang dilarang policy baru.
    Tinjau efek ini sebelum menjalankannya pada database produksi.
-4. Akun baru mendaftar sebagai `seeker` atau `owner`; role `admin` hanya dapat
-   ditetapkan dari SQL Editor oleh administrator.
+4. Akun baru otomatis mendaftar sebagai `seeker`. Administrator dapat
+   menetapkan role `owner` atau `admin` dari SQL Editor setelah memverifikasi
+   akun.
 5. Untuk latihan, nonaktifkan konfirmasi email pada Supabase Auth agar akun
    dapat langsung login.
+
+Jika `worksheet9.sql` sudah pernah dijalankan sebelumnya, jalankan juga
+`supabase/worksheet9_registration_role.sql` di SQL Editor untuk mengganti
+trigger registrasi tanpa menjalankan ulang skrip utama (yang mengganti policy
+lama pada `courses`).
 
 RLS hanya memberi pemilik izin mengubah/menghapus course dengan `owner_id`
 yang cocok. Data course lama yang `owner_id`-nya masih kosong tetap dapat dibaca

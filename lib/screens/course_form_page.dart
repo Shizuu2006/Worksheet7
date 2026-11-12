@@ -24,6 +24,10 @@ class _CourseFormPageState extends State<CourseFormPage> {
 
   bool get _isEdit => widget.course != null;
 
+  bool get _canManageCourse => _isEdit
+      ? widget.profile.canManageCourse(widget.course!.ownerId)
+      : widget.profile.canManageCourses;
+
   @override
   void initState() {
     super.initState();
@@ -44,10 +48,7 @@ class _CourseFormPageState extends State<CourseFormPage> {
 
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
-    final isOwnerOfCourse =
-        widget.course == null || widget.course!.ownerId == widget.profile.id;
-    if (!widget.profile.canManageCourses ||
-        (!widget.profile.isAdmin && !isOwnerOfCourse)) {
+    if (!_canManageCourse) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Anda tidak berhak mengelola course ini.')),
       );
@@ -79,6 +80,21 @@ class _CourseFormPageState extends State<CourseFormPage> {
 
   @override
   Widget build(BuildContext context) {
+    if (!_canManageCourse) {
+      return Scaffold(
+        appBar: AppBar(title: const Text('Akses Ditolak')),
+        body: const Center(
+          child: Padding(
+            padding: EdgeInsets.all(24),
+            child: Text(
+              'Anda tidak berhak mengelola course ini.',
+              textAlign: TextAlign.center,
+            ),
+          ),
+        ),
+      );
+    }
+
     final isSaving = context.watch<CourseProvider>().isSaving;
 
     return Scaffold(

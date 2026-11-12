@@ -100,9 +100,7 @@ class CourseDetailPage extends StatelessWidget {
     final description = current.description;
     final accentColor = _getCourseColor(code);
     final isFav = provider.isFavorite(code);
-    final canManageCurrent =
-        profile?.isAdmin == true ||
-        (profile?.isOwner == true && current.ownerId == profile?.id);
+    final canManageCurrent = profile?.canManageCourse(current.ownerId) == true;
 
     return Scaffold(
       appBar: AppBar(
